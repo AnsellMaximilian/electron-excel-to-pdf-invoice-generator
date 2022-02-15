@@ -1,0 +1,127 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+:root {
+  font-size: 16px;
+  --primary: rgb(10, 97, 209);
+  --secondary: rgb(102, 102, 102);
+}
+
+body {
+  position: relative;
+  font-family: sans-serif;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  padding: 10px 20px;
+  border-radius: 7.5px;
+  border: none;
+  appearance: none;
+  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
+    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+button:hover,
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  font-weight: bold;
+  color: white;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  height: fit-content;
+  width: fit-content;
+  margin: 10px;
+  color: inherit;
+  margin: 0;
+}
+
+a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.paper {
+  box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.25), -2px 0px 5px rgba(0, 0, 0, 0.25);
+  background-color: rgb(245, 245, 245);
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* HEADER */
+.header {
+  margin-bottom: 1rem;
+}
+
+.header nav ul {
+  display: flex;
+}
+
+.header nav a {
+  padding: 0.5rem 1rem;
+  border-radius: 7.5px;
+  display: block;
+}
+
+.header nav a:hover {
+  opacity: 0.9;
+}
+
+.header nav a.active {
+  font-weight: bold;
+  background-color: var(--primary);
+  color: white;
+}
+
+/* FILE FORM */
+.file-form {
+  text-align: center;
+  /* border: 2px var(--primary) solid; */
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.file-form button {
+  display: block;
+  margin-left: auto;
+}
+
+.file-form__input-container {
+  margin-bottom: 1rem;
+}
+
+.file-form__input-container label {
+  margin-top: 0.25rem;
+  display: inline-block;
+  padding: 0.75rem 1rem;
+  border-radius: 7.5px;
+  cursor: pointer;
+  background-color: var(--secondary);
+  color: white;
+}
+
+.file-form__input-container input {
+  display: none;
+}
