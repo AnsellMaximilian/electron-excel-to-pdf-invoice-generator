@@ -109,13 +109,19 @@ class InvoiceGenerator {
     const amountX = itemTotalX;
 
     // Delivery fees
+    const hasDeliveryFees = this.invoiceData.items.length > 0;
     const deliveryFeeTableY =
-      tableTopY + (this.invoiceData.items.length + 1) * 25 + 25;
+      tableTopY +
+      this.invoiceData.items.length * 25 +
+      25 +
+      (hasDeliveryFees ? 25 : 0);
 
-    output
-      .text('Ongkir', startOfPage, deliveryFeeTableY)
-      .text('Note', startOfPage, deliveryFeeTableY + 25)
-      .text('Amount', amountX, deliveryFeeTableY + 25);
+    if (hasDeliveryFees) {
+      output
+        .text('Ongkir', startOfPage, deliveryFeeTableY)
+        .text('Note', startOfPage, deliveryFeeTableY + 25)
+        .text('Amount', amountX, deliveryFeeTableY + 25);
+    }
 
     this.invoiceData.deliveryFees.forEach((fee, i) => {
       const deliveryFeeY = deliveryFeeTableY + 25 + 25 + 25 * i;
@@ -125,13 +131,19 @@ class InvoiceGenerator {
     });
 
     // Additional fees
+    const hasAdditionalFees = this.invoiceData.additionalFees.length > 0;
     const additionalFeeTableY =
-      deliveryFeeTableY + (this.invoiceData.deliveryFees.length + 1) * 25 + 50;
+      deliveryFeeTableY +
+      this.invoiceData.deliveryFees.length * 25 +
+      50 +
+      (hasAdditionalFees ? 25 : 0);
 
-    output
-      .text('Penambahan', startOfPage, additionalFeeTableY)
-      .text('Note', startOfPage, additionalFeeTableY + 25)
-      .text('Amount', amountX, additionalFeeTableY + 25);
+    if (hasAdditionalFees) {
+      output
+        .text('Penambahan', startOfPage, additionalFeeTableY)
+        .text('Note', startOfPage, additionalFeeTableY + 25)
+        .text('Amount', amountX, additionalFeeTableY + 25);
+    }
 
     this.invoiceData.additionalFees.forEach((fee, i) => {
       const additionalFeeY = additionalFeeTableY + 25 + 25 + 25 * i;
