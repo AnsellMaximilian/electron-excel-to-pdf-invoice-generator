@@ -44,8 +44,10 @@ class InvoiceGenerator {
 
   generate() {
     const output = new PDFGenerator();
-    const startOfPage = 50;
-    const endOfPage = 550;
+    const { width, margins } = output.page;
+    const startOfPage = 0 + margins.left;
+    const endOfPage = width - margins.right;
+    // console.log({ width, margins });
 
     // Pipe into pdf file
     output.pipe(
@@ -71,7 +73,10 @@ class InvoiceGenerator {
       .fontSize(15)
       .text(`Kepada: ${this.invoiceData.name}`)
       .moveUp()
-      .text('Bayar ke Ibu Fenty Effendi', { align: 'right' });
+      .text(
+        'Bayar ke Ibu Fenty Effendi Wowo wowo wowwo woowowo wowo owowow ow',
+        { align: 'right' }
+      );
 
     output.moveTo(startOfPage, 250).lineTo(endOfPage, 250).stroke();
 
