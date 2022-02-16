@@ -88,86 +88,84 @@ class InvoiceGenerator {
     const priceX = itemX + 250;
     const qtyX = priceX + 100;
     const itemTotalX = qtyX + 50;
-    const tableTopY = 275;
 
     output
-      .text('Item', itemX, tableTopY)
-      .text('Price', priceX, tableTopY)
-      .text('Qty', qtyX, tableTopY)
-      .text('Amount', itemTotalX, tableTopY)
+      .text('Item', itemX)
+      .moveUp()
+      .text('Price', priceX)
+      .moveUp()
+      .text('Qty', qtyX)
+      .moveUp()
+      .text('Amount', itemTotalX)
       .moveDown();
 
-    this.invoiceData.items.forEach((invoiceItem, i) => {
-      const itemY = tableTopY + 25 + 25 * i;
+    this.invoiceData.items.forEach((invoiceItem) => {
       output
-        .text(invoiceItem.name, itemX, itemY)
-        .text(invoiceItem.price.toString(), priceX, itemY)
-        .text(invoiceItem.qty.toString(), qtyX, itemY)
-        .text(invoiceItem.total.toString(), itemTotalX, itemY);
+        .text(invoiceItem.name, itemX)
+        .moveUp()
+        .text(invoiceItem.price.toString(), priceX)
+        .moveUp()
+        .text(invoiceItem.qty.toString(), qtyX)
+        .moveUp()
+        .text(invoiceItem.total.toString(), itemTotalX);
     });
     const noteX = startOfPage;
     const amountX = itemTotalX;
 
     // Delivery fees
     const hasDeliveryFees = this.invoiceData.items.length > 0;
-    const deliveryFeeTableY =
-      tableTopY +
-      this.invoiceData.items.length * 25 +
-      25 +
-      (hasDeliveryFees ? 25 : 0);
 
     if (hasDeliveryFees) {
       output
-        .text('Ongkir', startOfPage, deliveryFeeTableY)
-        .text('Note', startOfPage, deliveryFeeTableY + 25)
-        .text('Amount', amountX, deliveryFeeTableY + 25);
+        .moveDown(2)
+        .text('Ongkir', startOfPage)
+        .text('Note', noteX)
+        .moveUp()
+        .text('Amount', amountX);
     }
 
-    this.invoiceData.deliveryFees.forEach((fee, i) => {
-      const deliveryFeeY = deliveryFeeTableY + 25 + 25 + 25 * i;
+    this.invoiceData.deliveryFees.forEach((fee) => {
       output
-        .text(fee.note, noteX, deliveryFeeY)
-        .text(fee.amount.toString(), amountX, deliveryFeeY);
+        .text(fee.note, noteX)
+        .moveUp()
+        .text(fee.amount.toString(), amountX);
     });
 
     // Additional fees
     const hasAdditionalFees = this.invoiceData.additionalFees.length > 0;
-    const additionalFeeTableY =
-      deliveryFeeTableY +
-      this.invoiceData.deliveryFees.length * 25 +
-      50 +
-      (hasAdditionalFees ? 25 : 0);
 
     if (hasAdditionalFees) {
       output
-        .text('Penambahan', startOfPage, additionalFeeTableY)
-        .text('Note', startOfPage, additionalFeeTableY + 25)
-        .text('Amount', amountX, additionalFeeTableY + 25);
+        .moveDown(2)
+        .text('Penambahan', startOfPage)
+        .text('Note', startOfPage)
+        .moveUp()
+        .text('Amount', amountX);
     }
 
-    this.invoiceData.additionalFees.forEach((fee, i) => {
-      const additionalFeeY = additionalFeeTableY + 25 + 25 + 25 * i;
+    this.invoiceData.additionalFees.forEach((fee) => {
       output
-        .text(fee.note, noteX, additionalFeeY)
-        .text(fee.amount.toString(), amountX, additionalFeeY);
+        .text(fee.note, noteX)
+        .moveUp()
+        .text(fee.amount.toString(), amountX);
     });
 
     // Discounts
-    const discountTableY =
-      additionalFeeTableY +
-      (this.invoiceData.additionalFees.length + 1) * 25 +
-      50;
-
-    output
-      .text('Pengurangan', startOfPage, discountTableY)
-      .text('Note', startOfPage, discountTableY + 25)
-      .text('Amount', amountX, discountTableY + 25);
+    const hasDiscounts = this.invoiceData.discounts.length > 0;
+    if (hasDiscounts) {
+      output
+        .moveDown(2)
+        .text('Pengurangan', startOfPage)
+        .text('Note', startOfPage)
+        .moveUp()
+        .text('Amount', amountX);
+    }
 
     this.invoiceData.discounts.forEach((discount, i) => {
-      const discountY = discountTableY + 25 + 25 + 25 * i;
       output
-        .text(discount.note, noteX, discountY)
-        .text(discount.amount.toString(), amountX, discountY);
+        .text(discount.note, noteX)
+        .moveUp()
+        .text(discount.amount.toString(), amountX);
     });
 
     const grandTotal =
@@ -185,10 +183,7 @@ class InvoiceGenerator {
         0
       );
 
-    const grandTotalY =
-      discountTableY + (this.invoiceData.discounts.length + 1) * 25 + 50;
-
-    output.text(`Total: ${grandTotal}`, startOfPage, grandTotalY, {
+    output.text(`Total: ${grandTotal}`, startOfPage, undefined, {
       align: 'center',
     });
 
