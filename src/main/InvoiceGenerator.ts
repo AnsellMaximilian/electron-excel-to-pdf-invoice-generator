@@ -79,9 +79,12 @@ class InvoiceGenerator {
         headerHalfWidth,
         undefined,
         { align: 'right' }
-      );
+      )
+      .moveDown();
 
-    output.moveTo(startOfPage, 250).lineTo(endOfPage, 250).stroke();
+    output.moveTo(startOfPage, output.y).lineTo(endOfPage, output.y).stroke();
+
+    output.moveDown();
 
     // Table
     const itemX = startOfPage;
@@ -90,6 +93,7 @@ class InvoiceGenerator {
     const itemTotalX = qtyX + 50;
 
     output
+      .font('Helvetica-Bold')
       .text('Item', itemX)
       .moveUp()
       .text('Price', priceX)
@@ -97,7 +101,8 @@ class InvoiceGenerator {
       .text('Qty', qtyX)
       .moveUp()
       .text('Amount', itemTotalX)
-      .moveDown();
+      .moveDown()
+      .font('Helvetica');
 
     this.invoiceData.items.forEach((invoiceItem) => {
       output
@@ -118,10 +123,10 @@ class InvoiceGenerator {
     if (hasDeliveryFees) {
       output
         .moveDown(2)
+        .font('Helvetica-Bold')
         .text('Ongkir', startOfPage)
-        .text('Note', noteX)
-        .moveUp()
-        .text('Amount', amountX);
+        .moveDown()
+        .font('Helvetica');
     }
 
     this.invoiceData.deliveryFees.forEach((fee) => {
@@ -137,10 +142,10 @@ class InvoiceGenerator {
     if (hasAdditionalFees) {
       output
         .moveDown(2)
+        .font('Helvetica-Bold')
         .text('Penambahan', startOfPage)
-        .text('Note', startOfPage)
-        .moveUp()
-        .text('Amount', amountX);
+        .moveDown()
+        .font('Helvetica');
     }
 
     this.invoiceData.additionalFees.forEach((fee) => {
@@ -155,13 +160,13 @@ class InvoiceGenerator {
     if (hasDiscounts) {
       output
         .moveDown(2)
+        .font('Helvetica-Bold')
         .text('Pengurangan', startOfPage)
-        .text('Note', startOfPage)
-        .moveUp()
-        .text('Amount', amountX);
+        .moveDown()
+        .font('Helvetica');
     }
 
-    this.invoiceData.discounts.forEach((discount, i) => {
+    this.invoiceData.discounts.forEach((discount) => {
       output
         .text(discount.note, noteX)
         .moveUp()
