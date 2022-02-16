@@ -62,6 +62,7 @@ class InvoiceGenerator {
     );
 
     // Header
+    const headerHalfWidth = width / 2;
     output
       .fillColor('#61E03A')
       .fontSize(30)
@@ -69,12 +70,14 @@ class InvoiceGenerator {
       .moveDown()
       .fontSize(25)
       .fillColor('#000')
-      .text('INVOICE')
+      .text('INVOICE', { width: headerHalfWidth })
       .fontSize(15)
-      .text(`Kepada: ${this.invoiceData.name}`)
+      .text(`Kepada: ${this.invoiceData.name}`, { width: headerHalfWidth })
       .moveUp()
       .text(
         'Bayar ke Ibu Fenty Effendi Wowo wowo wowwo woowowo wowo owowow ow',
+        headerHalfWidth,
+        undefined,
         { align: 'right' }
       );
 
