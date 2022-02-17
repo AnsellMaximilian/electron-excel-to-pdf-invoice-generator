@@ -146,11 +146,10 @@ class InvoiceGenerator {
           align: 'right',
         });
     });
-    const noteX = startOfPage;
     const amountX = itemTotalX;
 
     // Subtotal
-    const subtotalColumnWidth = itemColumnWidth + priceColumnWidth;
+    const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
     const subtotal = this.invoiceData.items.reduce(
       (total, item) => total + item.total,
       0
@@ -159,12 +158,12 @@ class InvoiceGenerator {
       .moveDown()
       .font('Helvetica-Bold')
       .fontSize(15)
-      .text('SUBTOTAL:', startOfPage, undefined, {
+      .text('SUBTOTAL:', priceX, undefined, {
         width: subtotalColumnWidth,
-        align: 'right',
+        align: 'left',
       })
       .moveUp()
-      .text(rupiah(subtotal), subtotalColumnWidth, undefined, {
+      .text(rupiah(subtotal), {
         align: 'right',
       })
       .fontSize(10);
@@ -176,13 +175,19 @@ class InvoiceGenerator {
       output
         .moveDown(2)
         .font('Helvetica-Bold')
-        .text('Ongkir', startOfPage)
+        .text('Ongkir', priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .font('Helvetica');
     }
 
     this.invoiceData.deliveryFees.forEach((fee) => {
       output
-        .text(fee.note, noteX)
+        .text(fee.note, priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .moveUp()
         .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
     });
@@ -194,13 +199,19 @@ class InvoiceGenerator {
       output
         .moveDown(2)
         .font('Helvetica-Bold')
-        .text('Penambahan', startOfPage)
+        .text('Penambahan', priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .font('Helvetica');
     }
 
     this.invoiceData.additionalFees.forEach((fee) => {
       output
-        .text(fee.note, noteX)
+        .text(fee.note, priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .moveUp()
         .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
     });
@@ -211,13 +222,19 @@ class InvoiceGenerator {
       output
         .moveDown(2)
         .font('Helvetica-Bold')
-        .text('Pengurangan', startOfPage)
+        .text('Pengurangan', priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .font('Helvetica');
     }
 
     this.invoiceData.discounts.forEach((discount) => {
       output
-        .text(discount.note, noteX)
+        .text(discount.note, priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
         .moveUp()
         .text(rupiah(discount.amount), amountX, undefined, { align: 'right' });
     });
