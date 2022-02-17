@@ -150,28 +150,39 @@ class InvoiceGenerator {
       .moveDown()
       .font('Helvetica');
 
-    Object.keys(this.invoiceData.items).forEach((label) => {
-      // output.text(label);
+    Object.keys(this.invoiceData.items)
+      .sort()
+      .forEach((label) => {
+        output.moveDown();
 
-      this.invoiceData.items[label].forEach((invoiceItem) => {
-        output
-          .text(invoiceItem.name, itemX, undefined, { width: itemColumnWidth })
-          .moveUp()
-          .text(rupiah(invoiceItem.price), priceX, undefined, {
-            width: priceColumnWidth,
-            align: 'right',
-          })
-          .moveUp()
-          .text(invoiceItem.qty.toString(), qtyX, undefined, {
-            width: qtyColumnWidth,
-            align: 'center',
-          })
-          .moveUp()
-          .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
-            align: 'right',
-          });
+        if (!label.includes('Chi')) {
+          output
+            .font('Helvetica-BoldOblique')
+            .text(label, startOfPage)
+            .font('Helvetica');
+        }
+
+        this.invoiceData.items[label].forEach((invoiceItem) => {
+          output
+            .text(invoiceItem.name, itemX, undefined, {
+              width: itemColumnWidth,
+            })
+            .moveUp()
+            .text(rupiah(invoiceItem.price), priceX, undefined, {
+              width: priceColumnWidth,
+              align: 'right',
+            })
+            .moveUp()
+            .text(invoiceItem.qty.toString(), qtyX, undefined, {
+              width: qtyColumnWidth,
+              align: 'center',
+            })
+            .moveUp()
+            .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
+              align: 'right',
+            });
+        });
       });
-    });
 
     const amountX = itemTotalX;
 
