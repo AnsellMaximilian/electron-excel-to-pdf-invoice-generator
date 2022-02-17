@@ -149,6 +149,26 @@ class InvoiceGenerator {
     const noteX = startOfPage;
     const amountX = itemTotalX;
 
+    // Subtotal
+    const subtotalColumnWidth = itemColumnWidth + priceColumnWidth;
+    const subtotal = this.invoiceData.items.reduce(
+      (total, item) => total + item.total,
+      0
+    );
+    output
+      .moveDown()
+      .font('Helvetica-Bold')
+      .fontSize(15)
+      .text('SUBTOTAL:', startOfPage, undefined, {
+        width: subtotalColumnWidth,
+        align: 'right',
+      })
+      .moveUp()
+      .text(rupiah(subtotal), subtotalColumnWidth, undefined, {
+        align: 'right',
+      })
+      .fontSize(10);
+
     // Delivery fees
     const hasDeliveryFees = this.invoiceData.items.length > 0;
 
@@ -203,7 +223,7 @@ class InvoiceGenerator {
     });
 
     const grandTotal =
-      this.invoiceData.items.reduce((total, item) => total + item.total, 0) +
+      subtotal +
       this.invoiceData.deliveryFees.reduce(
         (total, item) => total + item.amount,
         0
