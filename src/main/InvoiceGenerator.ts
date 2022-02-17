@@ -53,6 +53,7 @@ class InvoiceGenerator {
   generate() {
     const output = new PDFGenerator();
     const { width, margins } = output.page;
+    const widthAfterMargins = width - margins.left - margins.right;
     const startOfPage = 0 + margins.left;
     const endOfPage = width - margins.right;
     // console.log({ width, margins });
@@ -102,32 +103,48 @@ class InvoiceGenerator {
     output.moveDown().fontSize(10);
 
     // Table
+    const itemColumnWidth = widthAfterMargins * 0.4;
+    const priceColumnWidth = widthAfterMargins * 0.2;
+    const qtyColumnWidth = widthAfterMargins * 0.2;
+    // const amountColumnWidth = width * 0.3;
+
     const itemX = startOfPage;
-    const priceX = itemX + 250;
-    const qtyX = priceX + 100;
-    const itemTotalX = qtyX + 50;
+    const priceX = itemX + itemColumnWidth;
+    const qtyX = priceX + priceColumnWidth;
+    const itemTotalX = qtyX + qtyColumnWidth;
 
     output
       .font('Helvetica-Bold')
-      .text('Item', itemX)
+      .text('Item', itemX, undefined, { width: itemColumnWidth })
       .moveUp()
-      .text('Price', priceX)
+      .text('Price', priceX, undefined, {
+        width: priceColumnWidth,
+        align: 'right',
+      })
       .moveUp()
-      .text('Qty', qtyX)
+      .text('Qty', qtyX, undefined, { width: qtyColumnWidth, align: 'center' })
       .moveUp()
-      .text('Amount', itemTotalX)
+      .text('Amount', itemTotalX, undefined, { align: 'right' })
       .moveDown()
       .font('Helvetica');
 
     this.invoiceData.items.forEach((invoiceItem) => {
       output
-        .text(invoiceItem.name, itemX)
+        .text(invoiceItem.name, itemX, undefined, { width: itemColumnWidth })
         .moveUp()
-        .text(rupiah(invoiceItem.price), priceX)
+        .text(rupiah(invoiceItem.price), priceX, undefined, {
+          width: priceColumnWidth,
+          align: 'right',
+        })
         .moveUp()
-        .text(invoiceItem.qty.toString(), qtyX)
+        .text(invoiceItem.qty.toString(), qtyX, undefined, {
+          width: qtyColumnWidth,
+          align: 'center',
+        })
         .moveUp()
-        .text(rupiah(invoiceItem.total), itemTotalX);
+        .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
+          align: 'right',
+        });
     });
     const noteX = startOfPage;
     const amountX = itemTotalX;
@@ -144,7 +161,10 @@ class InvoiceGenerator {
     }
 
     this.invoiceData.deliveryFees.forEach((fee) => {
-      output.text(fee.note, noteX).moveUp().text(rupiah(fee.amount), amountX);
+      output
+        .text(fee.note, noteX)
+        .moveUp()
+        .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
     });
 
     // Additional fees
@@ -159,7 +179,10 @@ class InvoiceGenerator {
     }
 
     this.invoiceData.additionalFees.forEach((fee) => {
-      output.text(fee.note, noteX).moveUp().text(rupiah(fee.amount), amountX);
+      output
+        .text(fee.note, noteX)
+        .moveUp()
+        .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
     });
 
     // Discounts
@@ -176,7 +199,7 @@ class InvoiceGenerator {
       output
         .text(discount.note, noteX)
         .moveUp()
-        .text(rupiah(discount.amount), amountX);
+        .text(rupiah(discount.amount), amountX, undefined, { align: 'right' });
     });
 
     const grandTotal =
