@@ -44,7 +44,10 @@ interface InvoicesObject {
 ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
   // TransactionFileProcessor.process(fileName, filePath);
   const tsWs = xlsx.readFile(filePath).Sheets.Transaction;
-  const tsWsJSON: TransactionRow[] = xlsx.utils.sheet_to_json(tsWs);
+
+  const tsWsJSON: TransactionRow[] =
+    TransactionFileProcessor.filterOutEmptyRows(xlsx.utils.sheet_to_json(tsWs));
+
   const invoicesData: InvoicesObject = tsWsJSON.reduce(
     (inovicesObject, row) => {
       const isDiscount = row.RealSUp === 'Pengurangan';

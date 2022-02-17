@@ -17,6 +17,17 @@ export interface TransactionRow {
 }
 
 class TransactionFileProcessor {
+  static filterOutEmptyRows(
+    transactionRows: TransactionRow[]
+  ): TransactionRow[] {
+    return transactionRows
+      .filter((row) => !!row.CUSTOMER)
+      .map((row) => {
+        row.DATE += ` ${new Date().getFullYear()}`;
+        return row;
+      });
+  }
+
   static process(fileName: string, filePath: string) {
     const newWb = xlxs.readFile(filePath);
 
@@ -39,12 +50,8 @@ class TransactionFileProcessor {
     );
 
     // Filter empty rows and add year in DATE column
-    const filteredNewTransactionJSON = newTransactionJSON
-      .filter((row) => !!row.CUSTOMER)
-      .map((row) => {
-        row.DATE += ` ${new Date().getFullYear()}`;
-        return row;
-      });
+    const filteredNewTransactionJSON =
+      TransactionFileProcessor.filterOutEmptyRows(newTransactionJSON);
 
     const archiveFilePath = path.join(
       app.getPath('home'),
