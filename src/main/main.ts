@@ -47,8 +47,13 @@ ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
   const invoicesData: InvoicesObject =
     InvoiceGenerator.getFormattedInvoiceObject(tsWsJSON);
 
-  const inv = new InvoiceGenerator(invoicesData.Adriani);
-  inv.generate();
+  // const inv = new InvoiceGenerator(invoicesData.Adriani);
+  // inv.generate();
+
+  Object.keys(invoicesData).forEach((label) => {
+    const inv = new InvoiceGenerator(invoicesData[label]);
+    inv.generate();
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {
