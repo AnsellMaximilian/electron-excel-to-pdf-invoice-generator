@@ -50,12 +50,27 @@ class InvoiceGenerator {
     this.invoiceData = invoiceData;
   }
 
+  static getStartOfPage(doc: PDFKit.PDFDocument) {
+    return doc.page.margins.left;
+  }
+
+  static getEndOfPage(doc: PDFKit.PDFDocument) {
+    return doc.page.width - doc.page.margins.right;
+  }
+
+  static drawLine(doc: PDFKit.PDFDocument, size: number) {
+    doc
+      .lineWidth(size)
+      .moveTo(InvoiceGenerator.getStartOfPage(doc), doc.y)
+      .lineTo(InvoiceGenerator.getEndOfPage(doc), doc.y)
+      .stroke();
+  }
+
   generate() {
     const output = new PDFGenerator();
     const { width, margins } = output.page;
     const widthAfterMargins = width - margins.left - margins.right;
     const startOfPage = 0 + margins.left;
-    const endOfPage = width - margins.right;
     // console.log({ width, margins });
 
     // Pipe into pdf file
@@ -94,11 +109,7 @@ class InvoiceGenerator {
       )
       .moveDown();
 
-    output
-      .lineWidth(3)
-      .moveTo(startOfPage, output.y)
-      .lineTo(endOfPage, output.y)
-      .stroke();
+    InvoiceGenerator.drawLine(output, 3);
 
     output.moveDown().fontSize(10);
 
@@ -154,6 +165,9 @@ class InvoiceGenerator {
       (total, item) => total + item.total,
       0
     );
+
+    InvoiceGenerator.drawLine(output.moveDown(), 1);
+
     output
       .moveDown()
       .font('Helvetica-Bold')
@@ -239,6 +253,7 @@ class InvoiceGenerator {
         .text(rupiah(discount.amount), amountX, undefined, { align: 'right' });
     });
 
+    // Grand total
     const grandTotal =
       subtotal +
       this.invoiceData.deliveryFees.reduce(
@@ -254,9 +269,20 @@ class InvoiceGenerator {
         0
       );
 
-    output.text(`Total: ${rupiah(grandTotal)}`, startOfPage, undefined, {
-      align: 'center',
-    });
+    InvoiceGenerator.drawLine(output.moveDown(), 3);
+
+    output
+      .moveDown()
+      .fontSize(17.5)
+      .font('Helvetica-Bold')
+      .text('GRAND TOTAL:', priceX, undefined, {
+        align: 'left',
+        width: subtotalColumnWidth,
+      })
+      .moveUp()
+      .text(rupiah(grandTotal), { align: 'right' })
+      .font('Helvetica')
+      .fontSize(10);
 
     output.end();
   }
