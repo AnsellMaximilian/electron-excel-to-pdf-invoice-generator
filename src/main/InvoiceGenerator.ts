@@ -76,8 +76,8 @@ class InvoiceGenerator {
       .fontSize(30)
       .font('Helvetica-Bold')
       .text('RUMAH SEHAT')
+      .fontSize(20)
       .moveDown()
-      .fontSize(25)
       .fillColor('#000')
       .text('INVOICE', { width: headerHalfWidth })
       .font('Helvetica')
@@ -99,7 +99,7 @@ class InvoiceGenerator {
       .lineTo(endOfPage, output.y)
       .stroke();
 
-    output.moveDown();
+    output.moveDown().fontSize(10);
 
     // Table
     const itemX = startOfPage;
@@ -140,7 +140,6 @@ class InvoiceGenerator {
         .moveDown(2)
         .font('Helvetica-Bold')
         .text('Ongkir', startOfPage)
-        .moveDown()
         .font('Helvetica');
     }
 
@@ -156,7 +155,6 @@ class InvoiceGenerator {
         .moveDown(2)
         .font('Helvetica-Bold')
         .text('Penambahan', startOfPage)
-        .moveDown()
         .font('Helvetica');
     }
 
@@ -171,7 +169,6 @@ class InvoiceGenerator {
         .moveDown(2)
         .font('Helvetica-Bold')
         .text('Pengurangan', startOfPage)
-        .moveDown()
         .font('Helvetica');
     }
 
