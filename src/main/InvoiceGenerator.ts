@@ -3,6 +3,14 @@ import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
 
+const rupiah = (value: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
 export interface InvoiceData {
   name: string;
   date: string;
@@ -115,11 +123,11 @@ class InvoiceGenerator {
       output
         .text(invoiceItem.name, itemX)
         .moveUp()
-        .text(invoiceItem.price.toString(), priceX)
+        .text(rupiah(invoiceItem.price), priceX)
         .moveUp()
         .text(invoiceItem.qty.toString(), qtyX)
         .moveUp()
-        .text(invoiceItem.total.toString(), itemTotalX);
+        .text(rupiah(invoiceItem.total), itemTotalX);
     });
     const noteX = startOfPage;
     const amountX = itemTotalX;
@@ -137,10 +145,7 @@ class InvoiceGenerator {
     }
 
     this.invoiceData.deliveryFees.forEach((fee) => {
-      output
-        .text(fee.note, noteX)
-        .moveUp()
-        .text(fee.amount.toString(), amountX);
+      output.text(fee.note, noteX).moveUp().text(rupiah(fee.amount), amountX);
     });
 
     // Additional fees
@@ -156,10 +161,7 @@ class InvoiceGenerator {
     }
 
     this.invoiceData.additionalFees.forEach((fee) => {
-      output
-        .text(fee.note, noteX)
-        .moveUp()
-        .text(fee.amount.toString(), amountX);
+      output.text(fee.note, noteX).moveUp().text(rupiah(fee.amount), amountX);
     });
 
     // Discounts
@@ -177,7 +179,7 @@ class InvoiceGenerator {
       output
         .text(discount.note, noteX)
         .moveUp()
-        .text(discount.amount.toString(), amountX);
+        .text(rupiah(discount.amount), amountX);
     });
 
     const grandTotal =
@@ -195,7 +197,7 @@ class InvoiceGenerator {
         0
       );
 
-    output.text(`Total: ${grandTotal}`, startOfPage, undefined, {
+    output.text(`Total: ${rupiah(grandTotal)}`, startOfPage, undefined, {
       align: 'center',
     });
 
