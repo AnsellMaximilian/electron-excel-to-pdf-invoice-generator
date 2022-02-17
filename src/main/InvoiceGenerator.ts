@@ -14,7 +14,7 @@ const rupiah = (value: number) => {
 export interface InvoiceData {
   name: string;
   date: string;
-  items: InvoiceItem[];
+  items: { [key: string]: InvoiceItem[] };
   additionalFees: AdditionalFee[];
   discounts: Discount[];
   deliveryFees: DeliveryFee[];
@@ -48,6 +48,17 @@ class InvoiceGenerator {
 
   constructor(invoiceData: InvoiceData) {
     this.invoiceData = invoiceData;
+  }
+
+  getItemsLength() {
+    return this.getFlattenedItems().length;
+  }
+
+  getFlattenedItems() {
+    return Object.keys(this.invoiceData.items).reduce(
+      (itemsArr, label) => [...itemsArr, ...this.invoiceData.items[label]],
+      [] as InvoiceItem[]
+    );
   }
 
   static getStartOfPage(doc: PDFKit.PDFDocument) {
@@ -139,29 +150,34 @@ class InvoiceGenerator {
       .moveDown()
       .font('Helvetica');
 
-    this.invoiceData.items.forEach((invoiceItem) => {
-      output
-        .text(invoiceItem.name, itemX, undefined, { width: itemColumnWidth })
-        .moveUp()
-        .text(rupiah(invoiceItem.price), priceX, undefined, {
-          width: priceColumnWidth,
-          align: 'right',
-        })
-        .moveUp()
-        .text(invoiceItem.qty.toString(), qtyX, undefined, {
-          width: qtyColumnWidth,
-          align: 'center',
-        })
-        .moveUp()
-        .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
-          align: 'right',
-        });
+    Object.keys(this.invoiceData.items).forEach((label) => {
+      // output.text(label);
+
+      this.invoiceData.items[label].forEach((invoiceItem) => {
+        output
+          .text(invoiceItem.name, itemX, undefined, { width: itemColumnWidth })
+          .moveUp()
+          .text(rupiah(invoiceItem.price), priceX, undefined, {
+            width: priceColumnWidth,
+            align: 'right',
+          })
+          .moveUp()
+          .text(invoiceItem.qty.toString(), qtyX, undefined, {
+            width: qtyColumnWidth,
+            align: 'center',
+          })
+          .moveUp()
+          .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
+            align: 'right',
+          });
+      });
     });
+
     const amountX = itemTotalX;
 
     // Subtotal
     const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
-    const subtotal = this.invoiceData.items.reduce(
+    const subtotal = this.getFlattenedItems().reduce(
       (total, item) => total + item.total,
       0
     );
@@ -183,7 +199,7 @@ class InvoiceGenerator {
       .fontSize(10);
 
     // Delivery fees
-    const hasDeliveryFees = this.invoiceData.items.length > 0;
+    const hasDeliveryFees = this.invoiceData.deliveryFees.length > 0;
 
     if (hasDeliveryFees) {
       output

@@ -56,7 +56,7 @@ ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
         inovicesObject[row.CUSTOMER] = {
           name: row.CUSTOMER,
           date: row.DATE,
-          items: [],
+          items: {},
           additionalFees: [],
           discounts: [],
           deliveryFees: [],
@@ -78,13 +78,18 @@ ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
           amount: row.TOTAL,
         });
       } else {
-        inovicesObject[row.CUSTOMER].items.push({
-          name: row.ITEM,
-          qty: row.QTY,
-          total: row.TOTAL,
-          price: row.PRICE,
-          supplier: row.RealSUp,
-        });
+        inovicesObject[row.CUSTOMER].items[row.SUPPLIER] = [
+          ...(inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
+            ? inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
+            : []),
+          {
+            name: row.ITEM,
+            qty: row.QTY,
+            total: row.TOTAL,
+            price: row.PRICE,
+            supplier: row.RealSUp,
+          },
+        ];
       }
 
       return inovicesObject;
