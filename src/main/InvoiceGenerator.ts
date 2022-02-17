@@ -66,23 +66,30 @@ class InvoiceGenerator {
     output
       .fillColor('#61E03A')
       .fontSize(30)
+      .font('Helvetica-Bold')
       .text('RUMAH SEHAT')
       .moveDown()
       .fontSize(25)
       .fillColor('#000')
       .text('INVOICE', { width: headerHalfWidth })
+      .font('Helvetica')
       .fontSize(15)
       .text(`Kepada: ${this.invoiceData.name}`, { width: headerHalfWidth })
-      .moveUp()
+      .text(`Periode: ${this.invoiceData.date}`, { width: headerHalfWidth })
+      .moveUp(2)
       .text(
-        'Bayar ke Ibu Fenty Effendi Wowo wowo wowwo woowowo wowo owowow ow',
+        'Transfer to BCA: 598-034-6333 (F.M. Fenty Effendy)',
         headerHalfWidth,
         undefined,
         { align: 'right' }
       )
       .moveDown();
 
-    output.moveTo(startOfPage, output.y).lineTo(endOfPage, output.y).stroke();
+    output
+      .lineWidth(3)
+      .moveTo(startOfPage, output.y)
+      .lineTo(endOfPage, output.y)
+      .stroke();
 
     output.moveDown();
 
