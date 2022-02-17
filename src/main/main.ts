@@ -37,23 +37,58 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
-  // TransactionFileProcessor.process(fileName, filePath);
-  const tsWs = xlsx.readFile(filePath).Sheets.Transaction;
+ipcMain.on(
+  'process-file',
+  (
+    _event,
+    fileName: string,
+    filePath: string,
+    invoicesToCombine: string[][] = []
+  ) => {
+    // TransactionFileProcessor.process(fileName, filePath);
+    const tsWs = xlsx.readFile(filePath).Sheets.Transaction;
 
-  const tsWsJSON: TransactionRow[] =
-    TransactionFileProcessor.filterOutEmptyRows(xlsx.utils.sheet_to_json(tsWs));
+    const tsWsJSON: TransactionRow[] =
+      TransactionFileProcessor.filterOutEmptyRows(
+        xlsx.utils.sheet_to_json(tsWs)
+      );
 
-  const invoicesData: InvoicesObject =
-    InvoiceGenerator.getFormattedInvoiceObject(tsWsJSON);
+    const invoicesData: InvoicesObject =
+      InvoiceGenerator.getFormattedInvoiceObject(tsWsJSON);
 
-  // const inv = new InvoiceGenerator(invoicesData.Adriani);
-  // inv.generate();
+    // Individual invoices
+    Object.keys(invoicesData)
+      .filter(
+        (label) =>
+          !invoicesToCombine.some((combination) => combination.includes(label))
+      )
+      .forEach((label) => {
+        const inv = new InvoiceGenerator(invoicesData[label]);
+        inv.generate();
+      });
 
-  Object.keys(invoicesData).forEach((label) => {
-    const inv = new InvoiceGenerator(invoicesData[label]);
-    inv.generate();
-  });
+    // Combined invoices
+    invoicesToCombine.forEach((combination) => {
+      InvoiceGenerator.generateCombinedInvoices(
+        ...combination.map((cus) => invoicesData[cus])
+      );
+    });
+
+    // InvoiceGenerator.generateCombinedInvoices(
+    //   invoicesData['Yuliana (Nelly)'],
+    //   invoicesData.Nelly
+    // );
+  }
+);
+
+ipcMain.handle('get-customers-from-file', (_event, filePath) => {
+  return InvoiceGenerator.getCustomers(
+    InvoiceGenerator.getFormattedInvoiceObject(
+      TransactionFileProcessor.filterOutEmptyRows(
+        xlsx.utils.sheet_to_json(xlsx.readFile(filePath).Sheets.Transaction)
+      )
+    )
+  );
 });
 
 if (process.env.NODE_ENV === 'production') {

@@ -23,4 +23,7 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send(channel, ...args);
     },
   },
+  getCustomersFromFile(filePath) {
+    return ipcRenderer.invoke('get-customers-from-file', filePath);
+  },
 });

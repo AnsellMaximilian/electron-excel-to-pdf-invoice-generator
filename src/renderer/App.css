@@ -125,3 +125,17 @@ a:hover {
 .file-form__input-container input {
   display: none;
 }
+
+/* CUSTOMER FORM */
+
+.customer-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.customer-form > div {
+  flex: 1;
+  flex-basis: 7.5rem;
+}
