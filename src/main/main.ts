@@ -18,7 +18,7 @@ import { resolveHtmlPath } from './util';
 import TransactionFileProcessor, {
   TransactionRow,
 } from './TransactionFileProcessor';
-import InvoiceGenerator, { InvoiceData } from './InvoiceGenerator';
+import InvoiceGenerator, { InvoicesObject } from './InvoiceGenerator';
 
 export default class AppUpdater {
   constructor() {
@@ -37,10 +37,6 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-interface InvoicesObject {
-  [key: string]: InvoiceData;
-}
-
 ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
   // TransactionFileProcessor.process(fileName, filePath);
   const tsWs = xlsx.readFile(filePath).Sheets.Transaction;
@@ -48,57 +44,9 @@ ipcMain.on('process-file', (_event, fileName: string, filePath: string) => {
   const tsWsJSON: TransactionRow[] =
     TransactionFileProcessor.filterOutEmptyRows(xlsx.utils.sheet_to_json(tsWs));
 
-  const invoicesData: InvoicesObject = tsWsJSON.reduce(
-    (inovicesObject, row) => {
-      const isDiscount = row.RealSUp === 'Pengurangan';
-      const isDeliveryFee = row.SUPPLIER === 'Ongkir';
-      const isAdditionalFee = row.RealSUp === 'Penambahan';
-      // const isItem = !isDiscount && !isDeliveryFee && isAdditionalFee;
+  const invoicesData: InvoicesObject =
+    InvoiceGenerator.getFormattedInvoiceObject(tsWsJSON);
 
-      if (!inovicesObject[row.CUSTOMER]) {
-        inovicesObject[row.CUSTOMER] = {
-          name: row.CUSTOMER,
-          date: row.DATE,
-          items: {},
-          additionalFees: [],
-          discounts: [],
-          deliveryFees: [],
-        };
-      }
-      if (isDeliveryFee) {
-        inovicesObject[row.CUSTOMER].deliveryFees.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else if (isDiscount) {
-        inovicesObject[row.CUSTOMER].discounts.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else if (isAdditionalFee) {
-        inovicesObject[row.CUSTOMER].additionalFees.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else {
-        inovicesObject[row.CUSTOMER].items[row.SUPPLIER] = [
-          ...(inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
-            ? inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
-            : []),
-          {
-            name: row.ITEM,
-            qty: row.QTY,
-            total: row.TOTAL,
-            price: row.PRICE,
-            supplier: row.RealSUp,
-          },
-        ];
-      }
-
-      return inovicesObject;
-    },
-    {} as InvoicesObject
-  );
   const inv = new InvoiceGenerator(invoicesData.Adriani);
   inv.generate();
 });

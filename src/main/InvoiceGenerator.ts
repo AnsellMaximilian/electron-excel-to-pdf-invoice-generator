@@ -2,6 +2,7 @@ import PDFGenerator from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
+import { TransactionRow } from './TransactionFileProcessor';
 
 const rupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -10,6 +11,10 @@ const rupiah = (value: number) => {
     maximumFractionDigits: 0,
   }).format(value);
 };
+
+export interface InvoicesObject {
+  [key: string]: InvoiceData;
+}
 
 export interface InvoiceData {
   name: string;
@@ -48,6 +53,59 @@ class InvoiceGenerator {
 
   constructor(invoiceData: InvoiceData) {
     this.invoiceData = invoiceData;
+  }
+
+  static getFormattedInvoiceObject(
+    transactionRows: TransactionRow[]
+  ): InvoicesObject {
+    return transactionRows.reduce((inovicesObject, row) => {
+      const isDiscount = row.RealSUp === 'Pengurangan';
+      const isDeliveryFee = row.SUPPLIER === 'Ongkir';
+      const isAdditionalFee = row.RealSUp === 'Penambahan';
+      // const isItem = !isDiscount && !isDeliveryFee && isAdditionalFee;
+
+      if (!inovicesObject[row.CUSTOMER]) {
+        inovicesObject[row.CUSTOMER] = {
+          name: row.CUSTOMER,
+          date: row.DATE,
+          items: {},
+          additionalFees: [],
+          discounts: [],
+          deliveryFees: [],
+        };
+      }
+      if (isDeliveryFee) {
+        inovicesObject[row.CUSTOMER].deliveryFees.push({
+          note: row.ITEM,
+          amount: row.TOTAL,
+        });
+      } else if (isDiscount) {
+        inovicesObject[row.CUSTOMER].discounts.push({
+          note: row.ITEM,
+          amount: row.TOTAL,
+        });
+      } else if (isAdditionalFee) {
+        inovicesObject[row.CUSTOMER].additionalFees.push({
+          note: row.ITEM,
+          amount: row.TOTAL,
+        });
+      } else {
+        inovicesObject[row.CUSTOMER].items[row.SUPPLIER] = [
+          ...(inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
+            ? inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
+            : []),
+          {
+            name: row.ITEM,
+            qty: row.QTY,
+            total: row.TOTAL,
+            price: row.PRICE,
+            supplier: row.RealSUp,
+          },
+        ];
+      }
+
+      return inovicesObject;
+    }, {} as InvoicesObject);
   }
 
   getItemsLength() {
