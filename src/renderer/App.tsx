@@ -7,6 +7,9 @@ import Header from './components/Header';
 const Process = () => {
   // const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileToBeProccessed, setFileToBeProccessed] = useState<File | null>(
+    null
+  );
   const [invoiceCustomers, setInvoiceCustomers] = useState<string[]>([]);
   const [combinedInvoices, setCombinedInvoices] = useState<string[][]>([]);
   const [checkedCustomers, setCheckedCustomers] = useState<string[]>([]);
@@ -52,15 +55,16 @@ const Process = () => {
         selectedFile.path
       )) as string[];
       setInvoiceCustomers(customers);
+      setFileToBeProccessed(selectedFile);
     }
   };
 
   const handleGeneratePDF = () => {
-    if (selectedFile) {
+    if (fileToBeProccessed) {
       window.electron.ipcRenderer.send(
         'process-file',
-        selectedFile.name,
-        selectedFile.path,
+        fileToBeProccessed.name,
+        fileToBeProccessed.path,
         combinedInvoices
       );
     }
