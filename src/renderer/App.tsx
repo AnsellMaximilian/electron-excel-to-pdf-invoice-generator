@@ -102,7 +102,7 @@ const Process = () => {
         })}
       </div>
       <button type="button" className="btn-primary" onClick={handleGeneratePDF}>
-        Generate PDF
+        Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
       </button>
       <form className="customer-form" onSubmit={handleCombineFormSubmit}>
         {invoiceCustomers.map((customer) => {
