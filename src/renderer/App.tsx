@@ -6,7 +6,7 @@ import Header from './components/Header';
 
 const Process = () => {
   // const fileInputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [invoiceCustomers, setInvoiceCustomers] = useState<string[]>([]);
   const [combinedInvoices, setCombinedInvoices] = useState<string[][]>([]);
   const [checkedCustomers, setCheckedCustomers] = useState<string[]>([]);
@@ -15,7 +15,7 @@ const Process = () => {
     e
   ) => {
     const chosenFile = e.target.files ? e.target.files[0] : null;
-    setFile(chosenFile);
+    setSelectedFile(chosenFile);
   };
 
   const handleCombineFormSubmit: React.FormEventHandler<HTMLFormElement> = (
@@ -43,24 +43,24 @@ const Process = () => {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    if (file) {
+    if (selectedFile) {
       // window.electron.ipcRenderer.send('process-file', file.name, file.path);
       // Reset combined invoices and checked checkboxes after another file has been processed
       setCombinedInvoices([]);
       setCheckedCustomers([]);
       const customers = (await window.electron.getCustomersFromFile(
-        file.path
+        selectedFile.path
       )) as string[];
       setInvoiceCustomers(customers);
     }
   };
 
   const handleGeneratePDF = () => {
-    if (file) {
+    if (selectedFile) {
       window.electron.ipcRenderer.send(
         'process-file',
-        file.name,
-        file.path,
+        selectedFile.name,
+        selectedFile.path,
         combinedInvoices
       );
     }
@@ -72,7 +72,7 @@ const Process = () => {
         <div className="file-form__input-container">
           <div>Excel File:</div>
           <label htmlFor="file" className="btn">
-            {file ? file.name : 'Choose Excel File'}
+            {selectedFile ? selectedFile.name : 'Choose Excel File'}
           </label>
           <input
             type="file"
