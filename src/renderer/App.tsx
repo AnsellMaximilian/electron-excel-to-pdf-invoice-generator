@@ -45,6 +45,9 @@ const Process = () => {
     e.preventDefault();
     if (file) {
       // window.electron.ipcRenderer.send('process-file', file.name, file.path);
+      // Reset combined invoices and checked checkboxes after another file has been processed
+      setCombinedInvoices([]);
+      setCheckedCustomers([]);
       const customers = (await window.electron.getCustomersFromFile(
         file.path
       )) as string[];
