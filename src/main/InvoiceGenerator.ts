@@ -422,7 +422,7 @@ class InvoiceGenerator {
       .moveDown()
       .fontSize(17.5)
       .font('Helvetica-Bold')
-      .text('GRAND TOTAL:', priceX, undefined, {
+      .text('Grand Total:', priceX, undefined, {
         align: 'left',
         width: subtotalColumnWidth,
       })
