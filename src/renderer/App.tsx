@@ -127,7 +127,7 @@ export default function App() {
     <Router>
       <Header />
       <Routes>
-        <Route path="/process" element={<Process />} />
+        <Route path="/" element={<Process />} />
       </Routes>
     </Router>
   );
