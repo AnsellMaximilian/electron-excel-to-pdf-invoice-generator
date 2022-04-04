@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-// import icon from '../../assets/icon.svg';
 import './App.css';
 import Header from './components/Header';
 
 const Process = () => {
-  // const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileToBeProccessed, setFileToBeProccessed] = useState<File | null>(
     null
@@ -47,8 +45,6 @@ const Process = () => {
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     if (selectedFile) {
-      // window.electron.ipcRenderer.send('process-file', file.name, file.path);
-      // Reset combined invoices and checked checkboxes after another file has been processed
       setCombinedInvoices([]);
       setCheckedCustomers([]);
       const customers = (await window.electron.getCustomersFromFile(
