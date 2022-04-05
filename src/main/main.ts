@@ -19,6 +19,7 @@ import TransactionFileProcessor, {
   TransactionRow,
 } from './TransactionFileProcessor';
 import InvoiceGenerator, { InvoicesObject } from './InvoiceGenerator';
+import Invoice from './Invoice';
 
 export default class AppUpdater {
   constructor() {
@@ -54,7 +55,7 @@ ipcMain.on(
       );
 
     const invoicesData: InvoicesObject =
-      InvoiceGenerator.getFormattedInvoiceObject(tsWsJSON);
+      Invoice.getFormattedInvoiceObject(tsWsJSON);
 
     // Individual invoices
     Object.keys(invoicesData)

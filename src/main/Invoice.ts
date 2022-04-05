@@ -19,7 +19,6 @@ class Invoice {
       const isDiscount = row.RealSUp === 'Pengurangan';
       const isDeliveryFee = row.SUPPLIER === 'Ongkir';
       const isAdditionalFee = row.RealSUp === 'Penambahan';
-      // const isItem = !isDiscount && !isDeliveryFee && isAdditionalFee;
 
       if (!inovicesObject[row.CUSTOMER]) {
         inovicesObject[row.CUSTOMER] = {
