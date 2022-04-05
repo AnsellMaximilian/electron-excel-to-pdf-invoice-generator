@@ -31,6 +31,37 @@ class InvoiceGenerator {
 
   static generateCombinedInvoices(...invoices: InvoiceData[]) {}
 
+  static generateHeader(
+    doc: PDFKit.PDFDocument,
+    headerHalfWidth: number,
+    dest: string,
+    date: string
+  ) {
+    doc
+      .fillColor('#61E03A')
+      .fontSize(30)
+      .font('Helvetica-Bold')
+      .text('RUMAH SEHAT')
+      .fontSize(20)
+      .moveDown()
+      .fillColor('#000')
+      .text('INVOICE', { width: headerHalfWidth })
+      .font('Helvetica')
+      .fontSize(15)
+      .text(`Kepada: ${dest}`, { width: headerHalfWidth })
+      .text(`Periode: ${date}`, { width: headerHalfWidth })
+      .moveUp(2)
+      .text(
+        'Transfer to BCA: 598-034-6333 (F.M. Fenty Effendy)',
+        headerHalfWidth,
+        undefined,
+        { align: 'right' }
+      )
+      .moveDown();
+
+    InvoiceGenerator.drawLine(doc, 3);
+  }
+
   static generate(invoice: Invoice): PDFKit.PDFDocument | null {
     const output = new PDFGenerator();
     const { width, margins } = output.page;
@@ -51,29 +82,12 @@ class InvoiceGenerator {
 
     // Header
     const headerHalfWidth = width / 2;
-    output
-      .fillColor('#61E03A')
-      .fontSize(30)
-      .font('Helvetica-Bold')
-      .text('RUMAH SEHAT')
-      .fontSize(20)
-      .moveDown()
-      .fillColor('#000')
-      .text('INVOICE', { width: headerHalfWidth })
-      .font('Helvetica')
-      .fontSize(15)
-      .text(`Kepada: ${invoice.invoiceData.name}`, { width: headerHalfWidth })
-      .text(`Periode: ${invoice.invoiceData.date}`, { width: headerHalfWidth })
-      .moveUp(2)
-      .text(
-        'Transfer to BCA: 598-034-6333 (F.M. Fenty Effendy)',
-        headerHalfWidth,
-        undefined,
-        { align: 'right' }
-      )
-      .moveDown();
-
-    InvoiceGenerator.drawLine(output, 3);
+    InvoiceGenerator.generateHeader(
+      output,
+      headerHalfWidth,
+      invoice.invoiceData.name,
+      invoice.invoiceData.date
+    );
 
     output.moveDown().fontSize(10);
 
