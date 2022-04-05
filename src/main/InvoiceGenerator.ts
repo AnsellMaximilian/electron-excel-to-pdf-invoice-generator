@@ -32,8 +32,10 @@ class InvoiceGenerator {
   static generateHeader(
     doc: PDFKit.PDFDocument,
     headerHalfWidth: number,
+    startOfPage: number,
     dest: string,
-    date: string
+    date: string,
+    amountDue: number
   ) {
     doc
       .fillColor('#61E03A')
@@ -47,15 +49,42 @@ class InvoiceGenerator {
       .font('Helvetica')
       .fontSize(15)
       .text(`Kepada: ${dest}`, { width: headerHalfWidth })
-      .text(`Periode: ${date}`, { width: headerHalfWidth })
-      .moveUp(2)
-      .text(
-        'Transfer to BCA: 598-034-6333 (F.M. Fenty Effendy)',
-        headerHalfWidth,
-        undefined,
-        { align: 'right' }
-      )
-      .moveDown();
+      .moveUp()
+      .text(`${date}`, startOfPage + headerHalfWidth, doc.y, {
+        align: 'right',
+      })
+      .moveDown(3)
+      .fontSize(12.5)
+      .text('Transfer to BCA: 598-034-6333', startOfPage, undefined, {
+        width: headerHalfWidth,
+      })
+      .text('(F.M. Fenty Effendy)', {
+        width: headerHalfWidth,
+      })
+      .moveUp(4)
+      .fontSize(15);
+
+    // Amount due
+    const margin = 5;
+    doc
+      .fillColor('#61E03A')
+      .rect(startOfPage + headerHalfWidth, doc.y, headerHalfWidth, 85)
+      .fill()
+      .fillColor('#FFF')
+      .font('Helvetica-Bold')
+      .moveDown()
+      .text('Amount Due', startOfPage + headerHalfWidth + margin, doc.y, {
+        align: 'left',
+      })
+      .moveDown()
+      .fontSize(17.5)
+      .text(rupiah(amountDue), startOfPage + headerHalfWidth, doc.y, {
+        align: 'right',
+        width: headerHalfWidth - margin,
+      })
+      .moveDown()
+      .fillColor('#000')
+      .font('Helvetica');
 
     InvoiceGenerator.drawLine(doc, 3);
   }
@@ -218,12 +247,15 @@ class InvoiceGenerator {
     );
 
     // Header
-    const headerHalfWidth = width / 2;
+    const headerHalfWidth = widthAfterMargins / 2;
+
     InvoiceGenerator.generateHeader(
       output,
       headerHalfWidth,
+      startOfPage,
       invoice.invoiceData.name,
-      invoice.invoiceData.date
+      invoice.invoiceData.date,
+      invoice.getGrandTotal()
     );
 
     output.moveDown().fontSize(10);
@@ -341,9 +373,16 @@ class InvoiceGenerator {
       )
     );
     // Header
-    const headerHalfWidth = width / 2;
+    const headerHalfWidth = widthAfterMargins / 2;
 
-    InvoiceGenerator.generateHeader(output, headerHalfWidth, dest, date);
+    InvoiceGenerator.generateHeader(
+      output,
+      headerHalfWidth,
+      startOfPage,
+      dest,
+      date,
+      invoices.reduce((sum, invoice) => sum + invoice.getGrandTotal(), 0)
+    );
 
     output.moveDown();
 
