@@ -2,7 +2,7 @@ import PDFGenerator from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import { TransactionRow } from './TransactionFileProcessor';
+import Invoice, { InvoiceData } from './Invoice';
 
 const rupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -12,139 +12,7 @@ const rupiah = (value: number) => {
   }).format(value);
 };
 
-export interface InvoicesObject {
-  [key: string]: InvoiceData;
-}
-
-export interface InvoiceData {
-  name: string;
-  date: string;
-  items: { [key: string]: InvoiceItem[] };
-  additionalFees: AdditionalFee[];
-  discounts: Discount[];
-  deliveryFees: DeliveryFee[];
-}
-
-export interface AdditionalFee {
-  note: string;
-  amount: number;
-}
-
-export interface Discount {
-  note: string;
-  amount: number;
-}
-
-export interface InvoiceItem {
-  name: string;
-  price: number;
-  qty: number;
-  total: number;
-  supplier: string;
-}
-
-export interface DeliveryFee {
-  note: string;
-  amount: number;
-}
-
 class InvoiceGenerator {
-  invoiceData: InvoiceData;
-
-  constructor(invoiceData: InvoiceData) {
-    this.invoiceData = invoiceData;
-  }
-
-  static getCustomers(invoicesObject: InvoicesObject) {
-    return Object.keys(invoicesObject);
-  }
-
-  static getFormattedInvoiceObject(
-    transactionRows: TransactionRow[]
-  ): InvoicesObject {
-    return transactionRows.reduce((inovicesObject, row) => {
-      const isDiscount = row.RealSUp === 'Pengurangan';
-      const isDeliveryFee = row.SUPPLIER === 'Ongkir';
-      const isAdditionalFee = row.RealSUp === 'Penambahan';
-      // const isItem = !isDiscount && !isDeliveryFee && isAdditionalFee;
-
-      if (!inovicesObject[row.CUSTOMER]) {
-        inovicesObject[row.CUSTOMER] = {
-          name: row.CUSTOMER,
-          date: row.DATE,
-          items: {},
-          additionalFees: [],
-          discounts: [],
-          deliveryFees: [],
-        };
-      }
-      if (isDeliveryFee) {
-        inovicesObject[row.CUSTOMER].deliveryFees.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else if (isDiscount) {
-        inovicesObject[row.CUSTOMER].discounts.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else if (isAdditionalFee) {
-        inovicesObject[row.CUSTOMER].additionalFees.push({
-          note: row.ITEM,
-          amount: row.TOTAL,
-        });
-      } else {
-        inovicesObject[row.CUSTOMER].items[row.SUPPLIER] = [
-          ...(inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
-            ? inovicesObject[row.CUSTOMER].items[row.SUPPLIER]
-            : []),
-          {
-            name: row.ITEM,
-            qty: row.QTY,
-            total: row.TOTAL,
-            price: row.PRICE,
-            supplier: row.RealSUp,
-          },
-        ];
-      }
-
-      return inovicesObject;
-    }, {} as InvoicesObject);
-  }
-
-  getItemsLength() {
-    return this.getFlattenedItems().length;
-  }
-
-  getFlattenedItems() {
-    return Object.keys(this.invoiceData.items).reduce(
-      (itemsArr, label) => [...itemsArr, ...this.invoiceData.items[label]],
-      [] as InvoiceItem[]
-    );
-  }
-
-  getSubtotal() {
-    return this.getFlattenedItems().reduce(
-      (total, item) => total + item.total,
-      0
-    );
-  }
-
-  getGrandTotal() {
-    return (
-      this.getSubtotal() +
-      this.invoiceData.deliveryFees.reduce(
-        (total, item) => total + item.amount,
-        0
-      ) +
-      this.invoiceData.additionalFees.reduce(
-        (total, item) => total + item.amount,
-        0
-      ) +
-      this.invoiceData.discounts.reduce((total, item) => total + item.amount, 0)
-    );
-  }
-
   static getStartOfPage(doc: PDFKit.PDFDocument) {
     return doc.page.margins.left;
   }
@@ -163,7 +31,7 @@ class InvoiceGenerator {
 
   static generateCombinedInvoices(...invoices: InvoiceData[]) {}
 
-  generate(): PDFKit.PDFDocument | null {
+  static generate(invoice: Invoice): PDFKit.PDFDocument | null {
     const output = new PDFGenerator();
     const { width, margins } = output.page;
     const widthAfterMargins = width - margins.left - margins.right;
@@ -176,7 +44,7 @@ class InvoiceGenerator {
           app.getPath('home'),
           'Rumah Sehat Archive',
           'Invoices',
-          `${this.invoiceData.name} ${this.invoiceData.date}.pdf`
+          `${invoice.invoiceData.name} ${invoice.invoiceData.date}.pdf`
         )
       )
     );
@@ -194,8 +62,8 @@ class InvoiceGenerator {
       .text('INVOICE', { width: headerHalfWidth })
       .font('Helvetica')
       .fontSize(15)
-      .text(`Kepada: ${this.invoiceData.name}`, { width: headerHalfWidth })
-      .text(`Periode: ${this.invoiceData.date}`, { width: headerHalfWidth })
+      .text(`Kepada: ${invoice.invoiceData.name}`, { width: headerHalfWidth })
+      .text(`Periode: ${invoice.invoiceData.date}`, { width: headerHalfWidth })
       .moveUp(2)
       .text(
         'Transfer to BCA: 598-034-6333 (F.M. Fenty Effendy)',
@@ -235,7 +103,7 @@ class InvoiceGenerator {
       .moveDown()
       .font('Helvetica');
 
-    Object.keys(this.invoiceData.items)
+    Object.keys(invoice.invoiceData.items)
       .sort()
       .forEach((label) => {
         output.moveDown();
@@ -247,7 +115,7 @@ class InvoiceGenerator {
             .font('Helvetica');
         }
 
-        this.invoiceData.items[label].forEach((invoiceItem) => {
+        invoice.invoiceData.items[label].forEach((invoiceItem) => {
           output
             .text(invoiceItem.name, itemX, undefined, {
               width: itemColumnWidth,
@@ -273,10 +141,9 @@ class InvoiceGenerator {
 
     // Subtotal
     const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
-    const subtotal = this.getFlattenedItems().reduce(
-      (total, item) => total + item.total,
-      0
-    );
+    const subtotal = invoice
+      .getFlattenedItems()
+      .reduce((total, item) => total + item.total, 0);
 
     InvoiceGenerator.drawLine(output.moveDown(), 1);
 
@@ -295,7 +162,7 @@ class InvoiceGenerator {
       .fontSize(10);
 
     // Delivery fees
-    const hasDeliveryFees = this.invoiceData.deliveryFees.length > 0;
+    const hasDeliveryFees = invoice.invoiceData.deliveryFees.length > 0;
 
     if (hasDeliveryFees) {
       output
@@ -308,7 +175,7 @@ class InvoiceGenerator {
         .font('Helvetica');
     }
 
-    this.invoiceData.deliveryFees.forEach((fee) => {
+    invoice.invoiceData.deliveryFees.forEach((fee) => {
       output
         .text(fee.note, priceX, undefined, {
           width: subtotalColumnWidth,
@@ -319,7 +186,7 @@ class InvoiceGenerator {
     });
 
     // Additional fees
-    const hasAdditionalFees = this.invoiceData.additionalFees.length > 0;
+    const hasAdditionalFees = invoice.invoiceData.additionalFees.length > 0;
 
     if (hasAdditionalFees) {
       output
@@ -332,7 +199,7 @@ class InvoiceGenerator {
         .font('Helvetica');
     }
 
-    this.invoiceData.additionalFees.forEach((fee) => {
+    invoice.invoiceData.additionalFees.forEach((fee) => {
       output
         .text(fee.note, priceX, undefined, {
           width: subtotalColumnWidth,
@@ -343,7 +210,7 @@ class InvoiceGenerator {
     });
 
     // Discounts
-    const hasDiscounts = this.invoiceData.discounts.length > 0;
+    const hasDiscounts = invoice.invoiceData.discounts.length > 0;
     if (hasDiscounts) {
       output
         .moveDown(2)
@@ -355,7 +222,7 @@ class InvoiceGenerator {
         .font('Helvetica');
     }
 
-    this.invoiceData.discounts.forEach((discount) => {
+    invoice.invoiceData.discounts.forEach((discount) => {
       output
         .text(discount.note, priceX, undefined, {
           width: subtotalColumnWidth,
@@ -368,15 +235,15 @@ class InvoiceGenerator {
     // Grand total
     const grandTotal =
       subtotal +
-      this.invoiceData.deliveryFees.reduce(
+      invoice.invoiceData.deliveryFees.reduce(
         (total, item) => total + item.amount,
         0
       ) +
-      this.invoiceData.additionalFees.reduce(
+      invoice.invoiceData.additionalFees.reduce(
         (total, item) => total + item.amount,
         0
       ) +
-      this.invoiceData.discounts.reduce(
+      invoice.invoiceData.discounts.reduce(
         (total, item) => total + item.amount,
         0
       );

@@ -1,5 +1,41 @@
-import { InvoiceData, InvoicesObject } from './InvoiceGenerator';
 import { TransactionRow } from './TransactionFileProcessor';
+
+export interface InvoicesObject {
+  [key: string]: InvoiceData;
+}
+
+export interface InvoiceData {
+  name: string;
+  date: string;
+  // Each item is put into array assigned into a key, grouped by supplier
+  items: { [key: string]: InvoiceItem[] };
+  additionalFees: AdditionalFee[];
+  discounts: Discount[];
+  deliveryFees: DeliveryFee[];
+}
+
+export interface AdditionalFee {
+  note: string;
+  amount: number;
+}
+
+export interface Discount {
+  note: string;
+  amount: number;
+}
+
+export interface InvoiceItem {
+  name: string;
+  price: number;
+  qty: number;
+  total: number;
+  supplier: string;
+}
+
+export interface DeliveryFee {
+  note: string;
+  amount: number;
+}
 
 class Invoice {
   invoiceData: InvoiceData;

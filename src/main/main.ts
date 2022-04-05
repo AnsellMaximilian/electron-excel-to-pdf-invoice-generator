@@ -18,8 +18,8 @@ import { resolveHtmlPath } from './util';
 import TransactionFileProcessor, {
   TransactionRow,
 } from './TransactionFileProcessor';
-import InvoiceGenerator, { InvoicesObject } from './InvoiceGenerator';
-import Invoice from './Invoice';
+import InvoiceGenerator from './InvoiceGenerator';
+import Invoice, { InvoicesObject } from './Invoice';
 
 export default class AppUpdater {
   constructor() {
@@ -64,8 +64,7 @@ ipcMain.on(
           !invoicesToCombine.some((combination) => combination.includes(label))
       )
       .forEach((label) => {
-        const inv = new InvoiceGenerator(invoicesData[label]);
-        inv.generate();
+        InvoiceGenerator.generate(new Invoice(invoicesData[label]));
       });
 
     // Combined invoices
@@ -83,8 +82,8 @@ ipcMain.on(
 );
 
 ipcMain.handle('get-customers-from-file', (_event, filePath) => {
-  return InvoiceGenerator.getCustomers(
-    InvoiceGenerator.getFormattedInvoiceObject(
+  return Invoice.getCustomers(
+    Invoice.getFormattedInvoiceObject(
       TransactionFileProcessor.filterOutEmptyRows(
         xlsx.utils.sheet_to_json(xlsx.readFile(filePath).Sheets.Transaction)
       )
