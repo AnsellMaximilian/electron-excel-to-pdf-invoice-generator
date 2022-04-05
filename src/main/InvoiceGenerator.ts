@@ -103,6 +103,10 @@ class InvoiceGenerator {
       .moveDown()
       .font('Helvetica');
 
+    InvoiceGenerator.drawLine(output, 1);
+
+    output.moveDown();
+
     Object.keys(invoice.invoiceData.items)
       .sort()
       .forEach((label) => {
