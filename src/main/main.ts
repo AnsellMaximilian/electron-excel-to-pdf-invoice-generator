@@ -64,8 +64,12 @@ ipcMain.on(
 
     // Combined invoices
     invoicesToCombine.forEach((combination) => {
+      const firstInvoice = invoicesData[combination[0]];
+      const { name: dest, date } = firstInvoice;
       InvoiceGenerator.generateCombinedInvoices(
-        ...combination.map((cus) => invoicesData[cus])
+        dest,
+        date,
+        ...combination.map((cus) => new Invoice(invoicesData[cus]))
       );
     });
 

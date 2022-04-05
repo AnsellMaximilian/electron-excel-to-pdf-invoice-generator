@@ -2,7 +2,7 @@ import PDFGenerator from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import Invoice, { AdditionalInvoiceItem, InvoiceData } from './Invoice';
+import Invoice, { AdditionalInvoiceItem } from './Invoice';
 
 const rupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -166,7 +166,6 @@ class InvoiceGenerator {
     doc
       .moveDown()
       .font('Helvetica-Bold')
-      .fontSize(15)
       .text(label, priceX, undefined, {
         width: subtotalColumnWidth,
         align: 'left',
@@ -174,8 +173,7 @@ class InvoiceGenerator {
       .moveUp()
       .text(rupiah(subtotal), {
         align: 'right',
-      })
-      .fontSize(10);
+      });
   }
 
   static generateGrandTotal(
@@ -321,109 +319,155 @@ class InvoiceGenerator {
     return null;
   }
 
-  static generateCombinedInvoices(...invoices: InvoiceData[]) {
-    // const output = new PDFGenerator();
-    // const { width, margins } = output.page;
-    // const widthAfterMargins = width - margins.left - margins.right;
-    // const startOfPage = 0 + margins.left;
-    // // Pipe into pdf file
-    // output.pipe(
-    //   fs.createWriteStream(
-    //     path.join(
-    //       app.getPath('home'),
-    //       'Rumah Sehat Archive',
-    //       'Invoices',
-    //       `${invoice.invoiceData.name} ${invoice.invoiceData.date}.pdf`
-    //     )
-    //   )
-    // );
-    // // Header
-    // const headerHalfWidth = width / 2;
-    // InvoiceGenerator.generateHeader(
-    //   output,
-    //   headerHalfWidth,
-    //   invoice.invoiceData.name,
-    //   invoice.invoiceData.date
-    // );
-    // output.moveDown().fontSize(10);
-    // // Table
-    // const itemColumnWidth = widthAfterMargins * 0.4;
-    // const priceColumnWidth = widthAfterMargins * 0.2;
-    // const qtyColumnWidth = widthAfterMargins * 0.2;
-    // const itemX = startOfPage;
-    // const priceX = itemX + itemColumnWidth;
-    // const qtyX = priceX + priceColumnWidth;
-    // const itemTotalX = qtyX + qtyColumnWidth;
-    // InvoiceGenerator.generateTable(
-    //   output,
-    //   invoice,
-    //   startOfPage,
-    //   itemColumnWidth,
-    //   priceColumnWidth,
-    //   qtyColumnWidth,
-    //   itemX,
-    //   priceX,
-    //   qtyX,
-    //   itemTotalX
-    // );
-    // const amountX = itemTotalX;
-    // // Subtotal
-    // const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
-    // const subtotal = invoice.getSubtotal();
-    // InvoiceGenerator.generateSubtotal(
-    //   output,
-    //   subtotal,
-    //   'Subtotal:',
-    //   priceX,
-    //   subtotalColumnWidth
-    // );
-    // // Delivery fees
-    // const hasDeliveryFees = invoice.invoiceData.deliveryFees.length > 0;
-    // if (hasDeliveryFees) {
-    //   InvoiceGenerator.generateAdditionalItemsTable(
-    //     output,
-    //     'Ongkir',
-    //     invoice.invoiceData.deliveryFees,
-    //     priceX,
-    //     subtotalColumnWidth,
-    //     amountX
-    //   );
-    // }
-    // // Additional fees
-    // const hasAdditionalFees = invoice.invoiceData.additionalFees.length > 0;
-    // if (hasAdditionalFees) {
-    //   InvoiceGenerator.generateAdditionalItemsTable(
-    //     output,
-    //     'Penambahan',
-    //     invoice.invoiceData.additionalFees,
-    //     priceX,
-    //     subtotalColumnWidth,
-    //     amountX
-    //   );
-    // }
-    // // Discounts
-    // const hasDiscounts = invoice.invoiceData.discounts.length > 0;
-    // if (hasDiscounts) {
-    //   InvoiceGenerator.generateAdditionalItemsTable(
-    //     output,
-    //     'Pengurangan',
-    //     invoice.invoiceData.discounts,
-    //     priceX,
-    //     subtotalColumnWidth,
-    //     amountX
-    //   );
-    // }
-    // // Grand total
-    // const grandTotal = invoice.getGrandTotal();
-    // InvoiceGenerator.generateGrandTotal(
-    //   output,
-    //   grandTotal,
-    //   'Grand Total:',
-    //   priceX,
-    //   subtotalColumnWidth
-    // );
-    // output.end();
-    // return null;
+  static generateCombinedInvoices(
+    dest: string,
+    date: string,
+    ...invoices: Invoice[]
+  ) {
+    const output = new PDFGenerator();
+    const { width, margins } = output.page;
+    const widthAfterMargins = width - margins.left - margins.right;
+    const startOfPage = 0 + margins.left;
+
+    // Pipe into pdf file
+    output.pipe(
+      fs.createWriteStream(
+        path.join(
+          app.getPath('home'),
+          'Rumah Sehat Archive',
+          'Invoices',
+          `${dest} ${date}.pdf`
+        )
+      )
+    );
+    // Header
+    const headerHalfWidth = width / 2;
+
+    InvoiceGenerator.generateHeader(output, headerHalfWidth, dest, date);
+
+    output.moveDown();
+
+    // Table
+    const itemColumnWidth = widthAfterMargins * 0.4;
+    const priceColumnWidth = widthAfterMargins * 0.2;
+    const qtyColumnWidth = widthAfterMargins * 0.2;
+    const itemX = startOfPage;
+    const priceX = itemX + itemColumnWidth;
+    const qtyX = priceX + priceColumnWidth;
+    const itemTotalX = qtyX + qtyColumnWidth;
+
+    let combinedTotal = 0;
+
+    invoices.forEach((invoice) => {
+      combinedTotal += invoice.getGrandTotal();
+      output
+        .fontSize(15)
+        .font('Helvetica-Bold')
+        .text(`Tagihan ${invoice.invoiceData.name}`, startOfPage, undefined, {
+          align: 'left',
+        })
+        .font('Helvetica')
+        .moveDown()
+        .fontSize(10);
+
+      InvoiceGenerator.generateTable(
+        output,
+        invoice,
+        startOfPage,
+        itemColumnWidth,
+        priceColumnWidth,
+        qtyColumnWidth,
+        itemX,
+        priceX,
+        qtyX,
+        itemTotalX
+      );
+      const amountX = itemTotalX;
+      // Subtotal
+      const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
+      const subtotal = invoice.getSubtotal();
+      InvoiceGenerator.generateSubtotal(
+        output,
+        subtotal,
+        `Subtotal ${invoice.invoiceData.name}:`,
+        priceX,
+        subtotalColumnWidth
+      );
+      // Delivery fees
+      const hasDeliveryFees = invoice.invoiceData.deliveryFees.length > 0;
+      if (hasDeliveryFees) {
+        InvoiceGenerator.generateAdditionalItemsTable(
+          output,
+          'Ongkir',
+          invoice.invoiceData.deliveryFees,
+          priceX,
+          subtotalColumnWidth,
+          amountX
+        );
+      }
+      // Additional fees
+      const hasAdditionalFees = invoice.invoiceData.additionalFees.length > 0;
+      if (hasAdditionalFees) {
+        InvoiceGenerator.generateAdditionalItemsTable(
+          output,
+          'Penambahan',
+          invoice.invoiceData.additionalFees,
+          priceX,
+          subtotalColumnWidth,
+          amountX
+        );
+      }
+      // Discounts
+      const hasDiscounts = invoice.invoiceData.discounts.length > 0;
+      if (hasDiscounts) {
+        InvoiceGenerator.generateAdditionalItemsTable(
+          output,
+          'Pengurangan',
+          invoice.invoiceData.discounts,
+          priceX,
+          subtotalColumnWidth,
+          amountX
+        );
+      }
+      // Grand total
+      const grandTotal = invoice.getGrandTotal();
+      InvoiceGenerator.generateGrandTotal(
+        output,
+        grandTotal,
+        `Total ${invoice.invoiceData.name}:`,
+        priceX,
+        subtotalColumnWidth
+      );
+
+      // InvoiceGenerator.drawLine(output, 3);
+      output
+        .moveDown()
+        .fillColor('#61E03A')
+        .rect(startOfPage, output.y, widthAfterMargins, 20)
+        .fill()
+        .fillColor('#000')
+        .moveDown(3);
+    });
+
+    output
+      .moveDown(2)
+      .font('Helvetica-Bold')
+      .fontSize(25)
+      .text('Grand Total', startOfPage, undefined, {
+        align: 'center',
+        width: widthAfterMargins,
+      })
+      .text(rupiah(combinedTotal), startOfPage, undefined, {
+        align: 'center',
+        width: widthAfterMargins,
+      });
+
+    InvoiceGenerator.drawLine(output, 3);
+    output.moveDown();
+    InvoiceGenerator.drawLine(output, 3);
+
+    output.end();
+    return null;
   }
 }
 
