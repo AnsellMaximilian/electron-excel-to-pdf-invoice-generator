@@ -46,13 +46,13 @@ class InvoiceGenerator {
       .moveDown()
       .fillColor('#000')
       .text('INVOICE', { width: headerHalfWidth })
-      .font('Helvetica')
       .fontSize(15)
       .text(`Kepada: ${dest}`, { width: headerHalfWidth })
       .moveUp()
       .text(`${date}`, startOfPage + headerHalfWidth, doc.y, {
         align: 'right',
       })
+      .font('Helvetica')
       .moveDown(3)
       .fontSize(12.5)
       .text('Transfer to BCA: 598-034-6333', startOfPage, undefined, {
