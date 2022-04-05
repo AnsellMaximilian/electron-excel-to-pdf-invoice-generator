@@ -2,7 +2,7 @@ import PDFGenerator from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
 import { app } from 'electron';
-import Invoice, { InvoiceData } from './Invoice';
+import Invoice, { AdditionalInvoiceItem, InvoiceData } from './Invoice';
 
 const rupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -28,8 +28,6 @@ class InvoiceGenerator {
       .lineTo(InvoiceGenerator.getEndOfPage(doc), doc.y)
       .stroke();
   }
-
-  static generateCombinedInvoices(...invoices: InvoiceData[]) {}
 
   static generateHeader(
     doc: PDFKit.PDFDocument,
@@ -61,6 +59,147 @@ class InvoiceGenerator {
 
     InvoiceGenerator.drawLine(doc, 3);
   }
+
+  static generateTable(
+    doc: PDFKit.PDFDocument,
+    invoice: Invoice,
+    startOfPage: number,
+    itemColumnWidth: number,
+    priceColumnWidth: number,
+    qtyColumnWidth: number,
+    itemX: number,
+    priceX: number,
+    qtyX: number,
+    itemTotalX: number
+  ) {
+    doc
+      .font('Helvetica-Bold')
+      .text('Item', itemX, undefined, { width: itemColumnWidth })
+      .moveUp()
+      .text('Price', priceX, undefined, {
+        width: priceColumnWidth,
+        align: 'right',
+      })
+      .moveUp()
+      .text('Qty', qtyX, undefined, { width: qtyColumnWidth, align: 'center' })
+      .moveUp()
+      .text('Amount', itemTotalX, undefined, { align: 'right' })
+      .moveDown()
+      .font('Helvetica');
+
+    InvoiceGenerator.drawLine(doc, 1);
+
+    doc.moveDown();
+
+    Object.keys(invoice.invoiceData.items)
+      .sort()
+      .forEach((label) => {
+        doc.moveDown();
+
+        if (!label.includes('Chi')) {
+          doc
+            .font('Helvetica-BoldOblique')
+            .text(label, startOfPage)
+            .font('Helvetica');
+        }
+
+        invoice.invoiceData.items[label].forEach((invoiceItem) => {
+          doc
+            .text(invoiceItem.name, itemX, undefined, {
+              width: itemColumnWidth,
+            })
+            .moveUp()
+            .text(rupiah(invoiceItem.price), priceX, undefined, {
+              width: priceColumnWidth,
+              align: 'right',
+            })
+            .moveUp()
+            .text(invoiceItem.qty.toString(), qtyX, undefined, {
+              width: qtyColumnWidth,
+              align: 'center',
+            })
+            .moveUp()
+            .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
+              align: 'right',
+            });
+        });
+      });
+  }
+
+  static generateAdditionalItemsTable(
+    doc: PDFKit.PDFDocument,
+    label: string,
+    items: AdditionalInvoiceItem[],
+    priceX: number,
+    subtotalColumnWidth: number,
+    amountX: number
+  ) {
+    doc
+      .moveDown(2)
+      .font('Helvetica-Bold')
+      .text(label, priceX, undefined, {
+        width: subtotalColumnWidth,
+        align: 'left',
+      })
+      .font('Helvetica');
+
+    items.forEach((fee) => {
+      doc
+        .text(fee.note, priceX, undefined, {
+          width: subtotalColumnWidth,
+          align: 'left',
+        })
+        .moveUp()
+        .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
+    });
+  }
+
+  static generateSubtotal(
+    doc: PDFKit.PDFDocument,
+    subtotal: number,
+    priceX: number,
+    subtotalColumnWidth: number
+  ) {
+    InvoiceGenerator.drawLine(doc.moveDown(), 1);
+
+    doc
+      .moveDown()
+      .font('Helvetica-Bold')
+      .fontSize(15)
+      .text('SUBTOTAL:', priceX, undefined, {
+        width: subtotalColumnWidth,
+        align: 'left',
+      })
+      .moveUp()
+      .text(rupiah(subtotal), {
+        align: 'right',
+      })
+      .fontSize(10);
+  }
+
+  static generateGrandTotal(
+    doc: PDFKit.PDFDocument,
+    grandTotal: number,
+    priceX: number,
+    subtotalColumnWidth: number
+  ) {
+    InvoiceGenerator.drawLine(doc.moveDown(), 3);
+
+    doc
+      .moveDown()
+      .fontSize(17.5)
+      .font('Helvetica-Bold')
+      .text('Grand Total:', priceX, undefined, {
+        align: 'left',
+        width: subtotalColumnWidth,
+      })
+      .moveUp()
+      .text(rupiah(grandTotal), { align: 'right' })
+      .font('Helvetica')
+      .fontSize(10);
+  }
+
+  static generateCombinedInvoices(...invoices: InvoiceData[]) {}
 
   static generate(invoice: Invoice): PDFKit.PDFDocument | null {
     const output = new PDFGenerator();
@@ -95,191 +234,86 @@ class InvoiceGenerator {
     const itemColumnWidth = widthAfterMargins * 0.4;
     const priceColumnWidth = widthAfterMargins * 0.2;
     const qtyColumnWidth = widthAfterMargins * 0.2;
-    // const amountColumnWidth = width * 0.3;
 
     const itemX = startOfPage;
     const priceX = itemX + itemColumnWidth;
     const qtyX = priceX + priceColumnWidth;
     const itemTotalX = qtyX + qtyColumnWidth;
 
-    output
-      .font('Helvetica-Bold')
-      .text('Item', itemX, undefined, { width: itemColumnWidth })
-      .moveUp()
-      .text('Price', priceX, undefined, {
-        width: priceColumnWidth,
-        align: 'right',
-      })
-      .moveUp()
-      .text('Qty', qtyX, undefined, { width: qtyColumnWidth, align: 'center' })
-      .moveUp()
-      .text('Amount', itemTotalX, undefined, { align: 'right' })
-      .moveDown()
-      .font('Helvetica');
-
-    InvoiceGenerator.drawLine(output, 1);
-
-    output.moveDown();
-
-    Object.keys(invoice.invoiceData.items)
-      .sort()
-      .forEach((label) => {
-        output.moveDown();
-
-        if (!label.includes('Chi')) {
-          output
-            .font('Helvetica-BoldOblique')
-            .text(label, startOfPage)
-            .font('Helvetica');
-        }
-
-        invoice.invoiceData.items[label].forEach((invoiceItem) => {
-          output
-            .text(invoiceItem.name, itemX, undefined, {
-              width: itemColumnWidth,
-            })
-            .moveUp()
-            .text(rupiah(invoiceItem.price), priceX, undefined, {
-              width: priceColumnWidth,
-              align: 'right',
-            })
-            .moveUp()
-            .text(invoiceItem.qty.toString(), qtyX, undefined, {
-              width: qtyColumnWidth,
-              align: 'center',
-            })
-            .moveUp()
-            .text(rupiah(invoiceItem.total), itemTotalX, undefined, {
-              align: 'right',
-            });
-        });
-      });
+    InvoiceGenerator.generateTable(
+      output,
+      invoice,
+      startOfPage,
+      itemColumnWidth,
+      priceColumnWidth,
+      qtyColumnWidth,
+      itemX,
+      priceX,
+      qtyX,
+      itemTotalX
+    );
 
     const amountX = itemTotalX;
 
     // Subtotal
     const subtotalColumnWidth = priceColumnWidth + qtyColumnWidth;
-    const subtotal = invoice
-      .getFlattenedItems()
-      .reduce((total, item) => total + item.total, 0);
+    const subtotal = invoice.getSubtotal();
 
-    InvoiceGenerator.drawLine(output.moveDown(), 1);
-
-    output
-      .moveDown()
-      .font('Helvetica-Bold')
-      .fontSize(15)
-      .text('SUBTOTAL:', priceX, undefined, {
-        width: subtotalColumnWidth,
-        align: 'left',
-      })
-      .moveUp()
-      .text(rupiah(subtotal), {
-        align: 'right',
-      })
-      .fontSize(10);
+    InvoiceGenerator.generateSubtotal(
+      output,
+      subtotal,
+      priceX,
+      subtotalColumnWidth
+    );
 
     // Delivery fees
     const hasDeliveryFees = invoice.invoiceData.deliveryFees.length > 0;
-
     if (hasDeliveryFees) {
-      output
-        .moveDown(2)
-        .font('Helvetica-Bold')
-        .text('Ongkir', priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .font('Helvetica');
+      InvoiceGenerator.generateAdditionalItemsTable(
+        output,
+        'Ongkir',
+        invoice.invoiceData.deliveryFees,
+        priceX,
+        subtotalColumnWidth,
+        amountX
+      );
     }
-
-    invoice.invoiceData.deliveryFees.forEach((fee) => {
-      output
-        .text(fee.note, priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .moveUp()
-        .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
-    });
 
     // Additional fees
     const hasAdditionalFees = invoice.invoiceData.additionalFees.length > 0;
-
     if (hasAdditionalFees) {
-      output
-        .moveDown(2)
-        .font('Helvetica-Bold')
-        .text('Penambahan', priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .font('Helvetica');
+      InvoiceGenerator.generateAdditionalItemsTable(
+        output,
+        'Penambahan',
+        invoice.invoiceData.additionalFees,
+        priceX,
+        subtotalColumnWidth,
+        amountX
+      );
     }
-
-    invoice.invoiceData.additionalFees.forEach((fee) => {
-      output
-        .text(fee.note, priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .moveUp()
-        .text(rupiah(fee.amount), amountX, undefined, { align: 'right' });
-    });
 
     // Discounts
     const hasDiscounts = invoice.invoiceData.discounts.length > 0;
     if (hasDiscounts) {
-      output
-        .moveDown(2)
-        .font('Helvetica-Bold')
-        .text('Pengurangan', priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .font('Helvetica');
+      InvoiceGenerator.generateAdditionalItemsTable(
+        output,
+        'Pengurangan',
+        invoice.invoiceData.discounts,
+        priceX,
+        subtotalColumnWidth,
+        amountX
+      );
     }
 
-    invoice.invoiceData.discounts.forEach((discount) => {
-      output
-        .text(discount.note, priceX, undefined, {
-          width: subtotalColumnWidth,
-          align: 'left',
-        })
-        .moveUp()
-        .text(rupiah(discount.amount), amountX, undefined, { align: 'right' });
-    });
-
     // Grand total
-    const grandTotal =
-      subtotal +
-      invoice.invoiceData.deliveryFees.reduce(
-        (total, item) => total + item.amount,
-        0
-      ) +
-      invoice.invoiceData.additionalFees.reduce(
-        (total, item) => total + item.amount,
-        0
-      ) +
-      invoice.invoiceData.discounts.reduce(
-        (total, item) => total + item.amount,
-        0
-      );
+    const grandTotal = invoice.getGrandTotal();
 
-    InvoiceGenerator.drawLine(output.moveDown(), 3);
-
-    output
-      .moveDown()
-      .fontSize(17.5)
-      .font('Helvetica-Bold')
-      .text('Grand Total:', priceX, undefined, {
-        align: 'left',
-        width: subtotalColumnWidth,
-      })
-      .moveUp()
-      .text(rupiah(grandTotal), { align: 'right' })
-      .font('Helvetica')
-      .fontSize(10);
+    InvoiceGenerator.generateGrandTotal(
+      output,
+      grandTotal,
+      priceX,
+      subtotalColumnWidth
+    );
 
     output.end();
     return null;

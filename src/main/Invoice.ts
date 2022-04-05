@@ -9,17 +9,12 @@ export interface InvoiceData {
   date: string;
   // Each item is put into array assigned into a key, grouped by supplier
   items: { [key: string]: InvoiceItem[] };
-  additionalFees: AdditionalFee[];
-  discounts: Discount[];
-  deliveryFees: DeliveryFee[];
+  additionalFees: AdditionalInvoiceItem[];
+  discounts: AdditionalInvoiceItem[];
+  deliveryFees: AdditionalInvoiceItem[];
 }
 
-export interface AdditionalFee {
-  note: string;
-  amount: number;
-}
-
-export interface Discount {
+export interface AdditionalInvoiceItem {
   note: string;
   amount: number;
 }
@@ -30,11 +25,6 @@ export interface InvoiceItem {
   qty: number;
   total: number;
   supplier: string;
-}
-
-export interface DeliveryFee {
-  note: string;
-  amount: number;
 }
 
 class Invoice {
