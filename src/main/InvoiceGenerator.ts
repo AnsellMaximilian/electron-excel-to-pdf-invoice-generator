@@ -161,60 +161,25 @@ class InvoiceGenerator {
       .stroke();
   }
 
-  static generateCombinedInvoices(...invoices: InvoiceData[]) {
-    let output: PDFKit.PDFDocument = new PDFGenerator();
-    let combinedTotal = 0;
-    let firstShareOutput = true;
-    invoices.forEach((invoice) => {
-      const inv = new InvoiceGenerator(invoice);
-      combinedTotal += inv.getGrandTotal();
-      output = inv.generate(
-        true,
-        firstShareOutput,
-        output
-      ) as PDFKit.PDFDocument;
-      firstShareOutput = false;
-    });
+  static generateCombinedInvoices(...invoices: InvoiceData[]) {}
 
-    output
-      .fontSize(30)
-      .font('Helvetica-Bold')
-      .text(`COMBINED GRAND TOTAL: ${rupiah(combinedTotal)}`, {
-        align: 'center',
-      });
-
-    output.end();
-  }
-
-  generate(
-    shareOutput = false,
-    firstShareOutput = false,
-    sharedOutput: PDFKit.PDFDocument | null = null
-  ): PDFKit.PDFDocument | null {
-    let output: PDFKit.PDFDocument;
-    if (shareOutput && sharedOutput !== null) {
-      output = sharedOutput;
-    } else {
-      output = new PDFGenerator();
-    }
+  generate(): PDFKit.PDFDocument | null {
+    const output = new PDFGenerator();
     const { width, margins } = output.page;
     const widthAfterMargins = width - margins.left - margins.right;
     const startOfPage = 0 + margins.left;
-    // console.log({ width, margins });
 
     // Pipe into pdf file
-    if (!shareOutput || (shareOutput && firstShareOutput)) {
-      output.pipe(
-        fs.createWriteStream(
-          path.join(
-            app.getPath('home'),
-            'Rumah Sehat Archive',
-            'Invoices',
-            `${this.invoiceData.name} ${this.invoiceData.date}.pdf`
-          )
+    output.pipe(
+      fs.createWriteStream(
+        path.join(
+          app.getPath('home'),
+          'Rumah Sehat Archive',
+          'Invoices',
+          `${this.invoiceData.name} ${this.invoiceData.date}.pdf`
         )
-      );
-    }
+      )
+    );
 
     // Header
     const headerHalfWidth = width / 2;
@@ -431,10 +396,6 @@ class InvoiceGenerator {
       .font('Helvetica')
       .fontSize(10);
 
-    if (shareOutput) {
-      output.addPage();
-      return output;
-    }
     output.end();
     return null;
   }
