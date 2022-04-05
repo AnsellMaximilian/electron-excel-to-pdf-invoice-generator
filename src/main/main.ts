@@ -40,12 +40,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 
 ipcMain.on(
   'process-file',
-  (
-    _event,
-    fileName: string,
-    filePath: string,
-    invoicesToCombine: string[][] = []
-  ) => {
+  (_event, filePath: string, invoicesToCombine: string[][] = []) => {
     // TransactionFileProcessor.process(fileName, filePath);
     const tsWs = xlsx.readFile(filePath).Sheets.Transaction;
 

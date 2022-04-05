@@ -59,7 +59,6 @@ const Process = () => {
     if (fileToBeProccessed) {
       window.electron.ipcRenderer.send(
         'process-file',
-        fileToBeProccessed.name,
         fileToBeProccessed.path,
         combinedInvoices
       );
