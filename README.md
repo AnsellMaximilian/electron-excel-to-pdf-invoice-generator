@@ -13,6 +13,8 @@ As I was given freedom on how the invoices could look like, I decided to look fo
 
 This would yield the same result I had gotten from manually creating the PDFs. Since I would be the only one using the application, I opted to make a desktop application.
 
+There was also a need to be able to combine invoices from multiple customers into a single invoice with a combined total, which didn't require much extra work with the Excel system. This functionality had to be present in the invoice generator application.
+
 ### Disclaimer
 
 I realize there are a lot of underlying problems with the system itself of using an Excel file to record transactions and then turning the data inside into invoices, but I made this application exclusively with the intention reduce the time wasted in making invoices with that current system. So, this application was made with the constraint of working with said Excel system. A complete point-of-sale desktop system would of course give a lot more benefits in addition to automatic invoice generation.
@@ -27,4 +29,12 @@ I realize there are a lot of underlying problems with the system itself of using
 | [React](https://reactjs.org/)                     | UI development                               |
 | [ERB](https://electron-react-boilerplate.js.org/) | Quick setup for a Electron-React application |
 
-## How It Works
+## The Application
+
+### Functional Requirements
+
+- Generate PDF invoices from an Excel file
+- Generate combined invoices between multiple customers into one PDF invoice
+  - Group customers from whom will be created a single PDF invoice
+  - Remove groups of customers from whom will have been created a single PDF invoice
+
