@@ -19,14 +19,22 @@ const Process = () => {
   const handleCombineFormSubmit: React.FormEventHandler<HTMLFormElement> = (
     e
   ) => {
+    e.preventDefault();
     if (checkedCustomers.length > 1) {
-      e.preventDefault();
       setCombinedInvoices((prev) => [...prev, checkedCustomers]);
       setInvoiceCustomers((prev) =>
         prev.filter((prevCus) => !checkedCustomers.includes(prevCus))
       );
       setCheckedCustomers([]);
     }
+  };
+
+  const handleRemoveCombination = (index: number) => {
+    setCombinedInvoices((prev) => {
+      const newArr = prev.slice();
+      newArr.splice(index, 1);
+      return newArr;
+    });
   };
 
   const handleCheckboxChange = (customer: string) => {
@@ -84,18 +92,6 @@ const Process = () => {
       <div className="paper">
         {selectedFile ? (
           <div>
-            <div>
-              TO BE COMBINED:{' '}
-              {combinedInvoices.map((customers) => {
-                return (
-                  <div key={`${customers[0]}`}>
-                    {customers.map((cus) => (
-                      <span key={cus}>{cus},</span>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
             <button
               type="button"
               className="btn-primary"
@@ -104,22 +100,47 @@ const Process = () => {
               Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
             </button>
             <form className="customer-form" onSubmit={handleCombineFormSubmit}>
-              {invoiceCustomers.map((customer) => {
-                return (
-                  <div key={customer}>
-                    <input
-                      type="checkbox"
-                      id={`${customer}-input`}
-                      checked={checkedCustomers.includes(customer)}
-                      onChange={() => handleCheckboxChange(customer)}
-                    />
-                    <label htmlFor={`${customer}-input`}>{customer}</label>
+              <div className="toolbar">
+                <div className="combine">
+                  <div className="customer-combinations">
+                    {combinedInvoices.map((customers, index) => {
+                      return (
+                        <div key={`${customers[0]}`}>
+                          <div>
+                            {customers.map((cus) => (
+                              <span key={cus}>{cus}</span>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveCombination(index)}
+                            >
+                              &times;
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-              <button type="submit" className="btn-primary">
-                Combine
-              </button>
+                  <button type="submit" className="btn-primary">
+                    Combine
+                  </button>
+                </div>
+              </div>
+              <div className="checkboxes">
+                {invoiceCustomers.map((customer) => {
+                  return (
+                    <div key={customer}>
+                      <input
+                        type="checkbox"
+                        id={`${customer}-input`}
+                        checked={checkedCustomers.includes(customer)}
+                        onChange={() => handleCheckboxChange(customer)}
+                      />
+                      <label htmlFor={`${customer}-input`}>{customer}</label>
+                    </div>
+                  );
+                })}
+              </div>
             </form>
           </div>
         ) : (

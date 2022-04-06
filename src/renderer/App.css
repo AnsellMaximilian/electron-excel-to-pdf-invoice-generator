@@ -128,13 +128,71 @@ a:hover {
 /* CUSTOMER FORM */
 
 .customer-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
   margin-top: 2rem;
 }
 
-.customer-form > div {
+.customer-form .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.customer-form .checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.customer-form .checkboxes > div {
   flex: 1;
   flex-basis: 7.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer-form .toolbar .combine {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.customer-combinations {
+  display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+}
+
+.customer-combinations > div > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.customer-combinations > div > div span {
+  display: block;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: 10px;
+  padding: 0.25rem;
+  border: rgb(164, 164, 164) 1px solid;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.customer-combinations > div > div button {
+  display: block;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  border-radius: 10px;
+  padding: 0.25rem;
+  border: rgb(164, 164, 164) 1px solid;
+  text-align: center;
+}
+
+.customer-combinations > div > div button:hover {
+  background-color: rgb(232, 232, 232);
 }
