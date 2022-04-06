@@ -68,4 +68,18 @@ Suggestions listed below will take into consideration the constraint of working 
 
 ## Docs
 
+### General Procedure
 
+<img src="https://user-images.githubusercontent.com/56351143/161959720-925903f0-d893-49b4-9093-88871d69b6cc.png" width="400">
+
+### File Processing
+
+<img src="https://user-images.githubusercontent.com/56351143/161959711-c5053d44-b24a-4b24-99c0-4b24cf520a6b.png" width="200">
+
+### Invoice Generation
+
+<img src="https://user-images.githubusercontent.com/56351143/161959697-fcab423a-8132-40ed-b4ba-c58e10d86ef5.png" width="400">
+
+### Legends
+
+<img src="https://user-images.githubusercontent.com/56351143/161959671-bd4a1e11-f883-434e-9715-64ce3c796ffe.png" width="600">
