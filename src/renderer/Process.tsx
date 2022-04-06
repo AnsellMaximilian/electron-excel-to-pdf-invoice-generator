@@ -94,17 +94,6 @@ const Process = () => {
         {selectedFile ? (
           <div>
             <form className="customer-form" onSubmit={handleCombineFormSubmit}>
-              <div className="toolbar">
-                <div className="search">
-                  <input
-                    value={customerFilter}
-                    type="search"
-                    className="search"
-                    placeholder="Search for customer"
-                    onChange={(e) => setCustomerFilter(e.target.value)}
-                  />
-                </div>
-              </div>
               <div className="combine-grid">
                 <div className="combine">
                   <div className="customer-combinations">
@@ -148,25 +137,36 @@ const Process = () => {
                   </div>
                 </div>
                 <div className="checkboxes">
-                  {invoiceCustomers
-                    .filter((customer) =>
-                      customer.toLowerCase().includes(customerFilter)
-                    )
-                    .map((customer) => {
-                      return (
-                        <div key={customer}>
-                          <input
-                            type="checkbox"
-                            id={`${customer}-input`}
-                            checked={checkedCustomers.includes(customer)}
-                            onChange={() => handleCheckboxChange(customer)}
-                          />
-                          <label htmlFor={`${customer}-input`}>
-                            {customer}
-                          </label>
-                        </div>
-                      );
-                    })}
+                  <div className="search">
+                    <input
+                      value={customerFilter}
+                      type="search"
+                      className="checkboxes_search"
+                      placeholder="Search for customer"
+                      onChange={(e) => setCustomerFilter(e.target.value)}
+                    />
+                  </div>
+                  <div className="checkboxes_items">
+                    {invoiceCustomers
+                      .filter((customer) =>
+                        customer.toLowerCase().includes(customerFilter)
+                      )
+                      .map((customer) => {
+                        return (
+                          <div key={customer}>
+                            <input
+                              type="checkbox"
+                              id={`${customer}-input`}
+                              checked={checkedCustomers.includes(customer)}
+                              onChange={() => handleCheckboxChange(customer)}
+                            />
+                            <label htmlFor={`${customer}-input`}>
+                              {customer}
+                            </label>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
             </form>

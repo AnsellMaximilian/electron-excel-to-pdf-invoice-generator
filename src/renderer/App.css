@@ -138,17 +138,14 @@ a:hover {
 
 /* CUSTOMER FORM */
 
-.customer-form .toolbar {
+.customer-form .checkboxes_items {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
-.customer-form .checkboxes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+.checkboxes_search {
+  margin-bottom: 1rem;
 }
 
 .generate {
@@ -157,7 +154,7 @@ a:hover {
   justify-content: flex-end;
 }
 
-.customer-form .checkboxes > div {
+.customer-form .checkboxes_items > div {
   flex: 1;
   flex-basis: 7.5rem;
   display: flex;
