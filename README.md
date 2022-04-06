@@ -51,6 +51,10 @@ As is shown in the demo, it now takes roughly the same amount of time to create 
 
 This application has not been packaged in any way, as I am considering future improvements and going into the command line and starting the app that way is convinent enough.
 
+### Note
+
+The application is made specifically to conform to an already existing table structure that is used in the previues Excel system.
+
 ### Suggestions
 
 This section is meant as a reminder to myself of future plans to improve the applications and to open discussion if people would like to suggest ways that I could improve this application or completely different alternative implementations, as I'm sure this is just one of the many ways the objective of this application could be achieved.
@@ -67,6 +71,8 @@ Suggestions listed below will take into consideration the constraint of working 
 <img src="https://user-images.githubusercontent.com/56351143/161952681-1f1b353e-edea-4f87-beff-92294deb40a9.png" width="400">
 
 ## Docs
+
+This section is for future reference in the event that I need to work on the application again for whatever reason or for someone wanting to see quickly how I implemented the functionalities of the application. The diagrams below give a simple overview of the general procedure of the application and some major steps in that general procedure.
 
 ### General Procedure
 
