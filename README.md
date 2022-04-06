@@ -39,6 +39,10 @@ I realize there are a lot of underlying problems with the system itself of using
   - Remove groups of customers from whom will have been created a single PDF invoice
   - Filter list of customers to select by name search query
 
+### Generating the Invoice
+
+To generate the invoice PDF, I use PDFKit. With this library, I could design and paint precisely what my invoice would look like using its point based system. It similar to painting in an HTML canvas. There may have been other simpler solutions for generating the invoices into PDF, but using PDFKit is fast and gives me a lot of useful methods and tools through its ```PDFDocument``` class.
+
 ### Result
 
 The application created fully accomplishes its main purpose of automatically creating invoices from an Excel file and its other supplementary functional requirements.
@@ -57,4 +61,11 @@ Suggestions listed below will take into consideration the constraint of working 
 ### Demo
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/56351143/161944165-37ad9b1a-bf37-4064-9640-52800da073e1.gif)
+
+### Invoice Presentation
+
+<img src="https://user-images.githubusercontent.com/56351143/161952681-1f1b353e-edea-4f87-beff-92294deb40a9.png" width="400">
+
+## Docs
+
 
