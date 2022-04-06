@@ -50,7 +50,7 @@ const Process = () => {
       const customers = (await window.electron.getCustomersFromFile(
         selectedFile.path
       )) as string[];
-      setInvoiceCustomers(customers);
+      setInvoiceCustomers(customers.sort());
       setFileToBeProccessed(selectedFile);
     }
   };
