@@ -111,7 +111,11 @@ const Process = () => {
                     <h3>Combine Invocies</h3>
                     <div className="customer-combinations__feedback">
                       <div className="feedback">
-                        <div>Selected:</div>
+                        <div>
+                          {checkedCustomers.length > 0
+                            ? 'Selected:'
+                            : 'None selected'}
+                        </div>
                         <div className="feedback_selected">
                           {checkedCustomers.map((cus) => (
                             <span key={cus}>{cus}</span>
