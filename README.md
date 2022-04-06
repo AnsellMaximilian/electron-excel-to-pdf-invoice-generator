@@ -39,6 +39,20 @@ I realize there are a lot of underlying problems with the system itself of using
   - Remove groups of customers from whom will have been created a single PDF invoice
   - Filter list of customers to select by name search query
 
+### Result
+
+The application created fully accomplishes its main purpose of automatically creating invoices from an Excel file and its other supplementary functional requirements.
+
+As is shown in the demo, it now takes roughly the same amount of time to create an invoice for **ALL** the customers in an Excel file as it used to to create an invoice for one **SINGLE** customer in the old Excel system.
+
+This application has not been packaged in any way, as I am considering future improvements and going into the command line and starting the app that way is convinent enough.
+
+### Suggestions
+
+Suggestions listed below will take into consideration the constraint of working with the old Excel system and the fact that the sole purpse of this application was to reduce time wasted in creating invoices with said system:
+- [ ] Test
+- [ ] Test
+
 ### Demo
 
 ![ezgif com-gif-maker](https://user-images.githubusercontent.com/56351143/161944165-37ad9b1a-bf37-4064-9640-52800da073e1.gif)
