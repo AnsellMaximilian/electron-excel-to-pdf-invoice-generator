@@ -27,10 +27,12 @@ const Process = () => {
         prev.filter((prevCus) => !checkedCustomers.includes(prevCus))
       );
       setCheckedCustomers([]);
+      setCustomerFilter('');
     }
   };
 
   const handleRemoveCombination = (index: number) => {
+    setInvoiceCustomers((prev) => [...prev, ...combinedInvoices[index]]);
     setCombinedInvoices((prev) => {
       const newArr = prev.slice();
       newArr.splice(index, 1);
