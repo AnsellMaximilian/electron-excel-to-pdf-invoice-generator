@@ -49,7 +49,7 @@ This application has not been packaged in any way, as I am considering future im
 
 ### Suggestions
 
-This section is meant as a reminder to myself of future plans to improve the applications and to open discussion if people would like to suggest ways that I could improve this application, as I'm sure this is just one of the many ways the objective of this application could be achieved.
+This section is meant as a reminder to myself of future plans to improve the applications and to open discussion if people would like to suggest ways that I could improve this application or completely different alternative implementations, as I'm sure this is just one of the many ways the objective of this application could be achieved.
 
 Suggestions listed below will take into consideration the constraint of working with the old Excel system and the fact that the sole purpse of this application was to reduce time wasted in creating invoices with said system:
 - [ ] Remove page freeze or add a loading indicator while the application is creating the invoices.
