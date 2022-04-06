@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const Process = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileProcessed, setFileProcessed] = useState(false);
   const [fileToBeProccessed, setFileToBeProccessed] = useState<File | null>(
     null
   );
@@ -15,6 +16,7 @@ const Process = () => {
   ) => {
     const chosenFile = e.target.files ? e.target.files[0] : null;
     setSelectedFile(chosenFile);
+    setFileProcessed(false);
   };
 
   const handleCombineFormSubmit: React.FormEventHandler<HTMLFormElement> = (
@@ -50,6 +52,10 @@ const Process = () => {
     }
   };
 
+  const handleCancel = () => {
+    setFileProcessed(false);
+  };
+
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     if (selectedFile) {
@@ -60,6 +66,7 @@ const Process = () => {
       )) as string[];
       setInvoiceCustomers(customers.sort());
       setFileToBeProccessed(selectedFile);
+      setFileProcessed(true);
     }
   };
 
@@ -93,7 +100,7 @@ const Process = () => {
         </button>
       </form>
       <div className="paper">
-        {selectedFile ? (
+        {fileProcessed ? (
           <div>
             <form className="customer-form" onSubmit={handleCombineFormSubmit}>
               <div className="combine-grid">
@@ -173,6 +180,13 @@ const Process = () => {
               </div>
             </form>
             <div className="generate">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
               <button
                 type="button"
                 className="btn-pdf"

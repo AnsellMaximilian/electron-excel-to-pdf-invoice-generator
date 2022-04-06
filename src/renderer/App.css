@@ -41,6 +41,16 @@ button:hover,
   color: white;
 }
 
+.btn-secondary {
+  color: var(--primary);
+  background-color: white;
+  font-weight: bold;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(251, 251, 251);
+}
+
 .btn-pdf {
   background-color: #f40204;
   font-weight: bold;
@@ -151,6 +161,7 @@ a:hover {
 .generate {
   margin-top: 2rem;
   display: flex;
+  gap: 1rem;
   justify-content: flex-end;
 }
 
