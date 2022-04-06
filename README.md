@@ -37,4 +37,9 @@ I realize there are a lot of underlying problems with the system itself of using
 - Generate combined invoices between multiple customers into one PDF invoice
   - Group customers from whom will be created a single PDF invoice
   - Remove groups of customers from whom will have been created a single PDF invoice
+  - Filter list of customers to select by name search query
+
+### Demo
+
+![ezgif com-gif-maker](https://user-images.githubusercontent.com/56351143/161944165-37ad9b1a-bf37-4064-9640-52800da073e1.gif)
 
