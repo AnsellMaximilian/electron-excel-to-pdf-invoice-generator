@@ -93,13 +93,6 @@ const Process = () => {
       <div className="paper">
         {selectedFile ? (
           <div>
-            <button
-              type="button"
-              className="btn-pdf"
-              onClick={handleGeneratePDF}
-            >
-              Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
-            </button>
             <form className="customer-form" onSubmit={handleCombineFormSubmit}>
               <div className="toolbar">
                 <div className="search">
@@ -111,12 +104,30 @@ const Process = () => {
                     onChange={(e) => setCustomerFilter(e.target.value)}
                   />
                 </div>
+              </div>
+              <div className="combine-grid">
                 <div className="combine">
                   <div className="customer-combinations">
-                    {combinedInvoices.map((customers, index) => {
-                      return (
-                        <div key={`${customers[0]}`}>
-                          <div>
+                    <h3>Combine Invocies</h3>
+                    <div className="customer-combinations__feedback">
+                      <div className="feedback">
+                        <div>Selected:</div>
+                        <div className="feedback_selected">
+                          {checkedCustomers.map((cus) => (
+                            <span key={cus}>{cus}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <button type="submit" className="btn-primary">
+                          Combine
+                        </button>
+                      </div>
+                    </div>
+                    <div className="customer-combinations_combinations">
+                      {combinedInvoices.map((customers, index) => {
+                        return (
+                          <div key={`${customers[0]}`}>
                             {customers.map((cus) => (
                               <span key={cus}>{cus}</span>
                             ))}
@@ -127,35 +138,43 @@ const Process = () => {
                               &times;
                             </button>
                           </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className="checkboxes">
+                  {invoiceCustomers
+                    .filter((customer) =>
+                      customer.toLowerCase().includes(customerFilter)
+                    )
+                    .map((customer) => {
+                      return (
+                        <div key={customer}>
+                          <input
+                            type="checkbox"
+                            id={`${customer}-input`}
+                            checked={checkedCustomers.includes(customer)}
+                            onChange={() => handleCheckboxChange(customer)}
+                          />
+                          <label htmlFor={`${customer}-input`}>
+                            {customer}
+                          </label>
                         </div>
                       );
                     })}
-                  </div>
-                  <button type="submit" className="btn-primary">
-                    Combine
-                  </button>
                 </div>
               </div>
-              <div className="checkboxes">
-                {invoiceCustomers
-                  .filter((customer) =>
-                    customer.toLowerCase().includes(customerFilter)
-                  )
-                  .map((customer) => {
-                    return (
-                      <div key={customer}>
-                        <input
-                          type="checkbox"
-                          id={`${customer}-input`}
-                          checked={checkedCustomers.includes(customer)}
-                          onChange={() => handleCheckboxChange(customer)}
-                        />
-                        <label htmlFor={`${customer}-input`}>{customer}</label>
-                      </div>
-                    );
-                  })}
-              </div>
             </form>
+            <div className="generate">
+              <button
+                type="button"
+                className="btn-pdf"
+                onClick={handleGeneratePDF}
+              >
+                Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
+              </button>
+            </div>
           </div>
         ) : (
           <h2>Please select an Excel file to process.</h2>
