@@ -54,6 +54,8 @@ const Process = () => {
 
   const handleCancel = () => {
     setFileProcessed(false);
+    setSelectedFile(null);
+    setFileToBeProccessed(null);
   };
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
