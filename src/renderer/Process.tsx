@@ -81,39 +81,51 @@ const Process = () => {
           Process File
         </button>
       </form>
-      <div>
-        TO BE COMBINED:{' '}
-        {combinedInvoices.map((customers) => {
-          return (
-            <div key={`${customers[0]}`}>
-              {customers.map((cus) => (
-                <span key={cus}>{cus},</span>
-              ))}
+      <div className="paper">
+        {selectedFile ? (
+          <div>
+            <div>
+              TO BE COMBINED:{' '}
+              {combinedInvoices.map((customers) => {
+                return (
+                  <div key={`${customers[0]}`}>
+                    {customers.map((cus) => (
+                      <span key={cus}>{cus},</span>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handleGeneratePDF}
+            >
+              Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
+            </button>
+            <form className="customer-form" onSubmit={handleCombineFormSubmit}>
+              {invoiceCustomers.map((customer) => {
+                return (
+                  <div key={customer}>
+                    <input
+                      type="checkbox"
+                      id={`${customer}-input`}
+                      checked={checkedCustomers.includes(customer)}
+                      onChange={() => handleCheckboxChange(customer)}
+                    />
+                    <label htmlFor={`${customer}-input`}>{customer}</label>
+                  </div>
+                );
+              })}
+              <button type="submit" className="btn-primary">
+                Combine
+              </button>
+            </form>
+          </div>
+        ) : (
+          <h2>Please select an Excel file to process.</h2>
+        )}
       </div>
-      <button type="button" className="btn-primary" onClick={handleGeneratePDF}>
-        Generate PDF {fileToBeProccessed && fileToBeProccessed.name}
-      </button>
-      <form className="customer-form" onSubmit={handleCombineFormSubmit}>
-        {invoiceCustomers.map((customer) => {
-          return (
-            <div key={customer}>
-              <input
-                type="checkbox"
-                id={`${customer}-input`}
-                checked={checkedCustomers.includes(customer)}
-                onChange={() => handleCheckboxChange(customer)}
-              />
-              <label htmlFor={`${customer}-input`}>{customer}</label>
-            </div>
-          );
-        })}
-        <button type="submit" className="btn-primary">
-          Combine
-        </button>
-      </form>
     </div>
   );
 };
