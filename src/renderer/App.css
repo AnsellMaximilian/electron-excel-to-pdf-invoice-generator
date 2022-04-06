@@ -40,6 +40,16 @@ button:hover,
   color: white;
 }
 
+.btn-pdf {
+  background-color: #f40204;
+  font-weight: bold;
+  color: white;
+}
+
+.btn-pdf:hover {
+  background-color: #df0000;
+}
+
 li {
   list-style: none;
 }
@@ -195,4 +205,13 @@ a:hover {
 
 .customer-combinations > div > div button:hover {
   background-color: rgb(232, 232, 232);
+}
+
+.search {
+  display: flex;
+  align-items: flex-end;
+}
+
+input {
+  padding: 0.35rem;
 }
