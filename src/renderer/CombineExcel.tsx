@@ -13,8 +13,13 @@ const CombineExcel = () => {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    // if (newFileName) {
-    // }
+    if (newFileName) {
+      window.electron.ipcRenderer.send(
+        'combine-excel-files',
+        selectedFiles.map((file) => file.path),
+        newFileName
+      );
+    }
   };
 
   return (

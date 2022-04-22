@@ -137,6 +137,7 @@ class TransactionFileProcessor {
 
     // Create workbook
     const combinedFile = xlxs.utils.book_new();
+    const combinedRows: TransactionRow[] = [];
 
     filePaths.forEach((filePath) => {
       const newWb = xlxs.readFile(filePath);
@@ -163,13 +164,15 @@ class TransactionFileProcessor {
       const filteredNewTransactionJSON =
         TransactionFileProcessor.filterOutEmptyRows(newTransactionJSON);
 
-      // Append filtered sheet
-      xlxs.utils.book_append_sheet(
-        combinedFile,
-        xlxs.utils.json_to_sheet(filteredNewTransactionJSON),
-        masterSheetName
-      );
+      combinedRows.push(...filteredNewTransactionJSON);
     });
+
+    // Append combined rows JSON
+    xlxs.utils.book_append_sheet(
+      combinedFile,
+      xlxs.utils.json_to_sheet(combinedRows),
+      masterSheetName
+    );
 
     // Write into file
     xlxs.writeFile(combinedFile, combinedFilePath);
