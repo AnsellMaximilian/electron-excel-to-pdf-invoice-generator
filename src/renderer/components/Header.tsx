@@ -8,6 +8,9 @@ const Header = () => {
           <li>
             <NavLink to="/">Process File</NavLink>
           </li>
+          <li>
+            <NavLink to="/combine-excel">Combine Excel</NavLink>
+          </li>
         </ul>
       </nav>
     </header>
