@@ -90,6 +90,8 @@ ipcMain.handle('get-customers-from-file', (_event, filePath) => {
   );
 });
 
+ipcMain.on('combine-excel-files', (_event, filePaths: string[]) => {});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();
