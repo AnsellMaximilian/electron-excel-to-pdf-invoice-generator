@@ -292,3 +292,13 @@ a:hover {
 input {
   padding: 0.35rem;
 }
+
+/* COMBINED FORM */
+
+.file-form__file-name {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}

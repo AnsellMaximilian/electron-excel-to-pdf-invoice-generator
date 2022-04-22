@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const CombineExcel = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [newFileName, setNewFileName] = useState('');
 
   const handleFileInputChange: React.ChangeEventHandler<HTMLInputElement> = (
     e
@@ -12,6 +13,8 @@ const CombineExcel = () => {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    // if (newFileName) {
+    // }
   };
 
   return (
@@ -30,6 +33,15 @@ const CombineExcel = () => {
             id="file"
             accept=".xlsx"
             onChange={handleFileInputChange}
+          />
+        </div>
+        <div className="file-form__file-name">
+          <label htmlFor="combined-name">Combined File Name</label>
+          <input
+            type="text"
+            id="combined-name"
+            value={newFileName}
+            onChange={(e) => setNewFileName(e.target.value)}
           />
         </div>
         <button className="btn-primary" type="submit">
