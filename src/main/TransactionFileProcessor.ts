@@ -123,6 +123,57 @@ class TransactionFileProcessor {
     // Write into file
     xlxs.writeFile(archiveFile, archiveFilePath);
   }
+
+  static combineExcelFiles(filePaths: string[], newFileName: string) {
+    const combinedFilePath = path.join(
+      app.getPath('home'),
+      'Rumah Sehat Archive',
+      `${newFileName}.xlsx`
+    );
+
+    const masterSheetName = 'Master';
+
+    // CREATING THE COMBINED FILE
+
+    // Create workbook
+    const combinedFile = xlxs.utils.book_new();
+
+    filePaths.forEach((filePath) => {
+      const newWb = xlxs.readFile(filePath);
+
+      const newTransactionSheet = newWb.Sheets.Transaction;
+
+      const sheetRange = xlxs.utils.decode_range(
+        newTransactionSheet['!ref'] as string
+      );
+
+      sheetRange.s.c = 0;
+      sheetRange.e.c = 9;
+
+      const newSheetRange = xlxs.utils.encode_range(sheetRange);
+
+      const newTransactionJSON: TransactionRow[] = xlxs.utils.sheet_to_json(
+        newTransactionSheet,
+        {
+          range: newSheetRange,
+        }
+      );
+
+      // Filter empty rows and add year in DATE column
+      const filteredNewTransactionJSON =
+        TransactionFileProcessor.filterOutEmptyRows(newTransactionJSON);
+
+      // Append filtered sheet
+      xlxs.utils.book_append_sheet(
+        combinedFile,
+        xlxs.utils.json_to_sheet(filteredNewTransactionJSON),
+        masterSheetName
+      );
+    });
+
+    // Write into file
+    xlxs.writeFile(combinedFile, combinedFilePath);
+  }
 }
 
 export default TransactionFileProcessor;
